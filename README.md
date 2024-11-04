@@ -17,4 +17,4 @@ User wants to find similar songs to one they like. User runs the program to gene
 
 The user needs to input criteria into the recommendation algorithm. User sees genres and similar artists based on Constants provided in the code. User selects desired genres and similar artists to get more tailored recommendations. [Lola’s story]
 
-User needs blank. User runs the program and uses to blank. User receives/sees blank which accomplishes goal of blank. [Justin’s story]
+User is not satisfied with the generated playlist. User removes song/songs they don't like from the playlist and the algorithm continues to find more recommended songs to fill the playlist. [Justin’s story]
