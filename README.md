@@ -5,7 +5,7 @@ Team Members:
 - Sergio Sanchez Sergio-098
 - Amazing Lawal lolamp4
 - Fawaz Omidiya FawazOmidiya
-- Justin Huang 
+- Justin Huang JustinHarvo
 
 User needs to generate a playlist based on their input criteria. The user runs the program, which takes a group of target genres, artists, and songs into account, along with their listening history and receives a new playlist personalized to their inputs. [Team story] 
 
