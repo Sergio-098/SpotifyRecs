@@ -9,15 +9,16 @@ import javax.naming.AuthenticationException;
 import java.io.IOException;
 import java.util.List;
 
+
 public interface SpotifyAPIClient {
 
     /**
      * Creates a new playlist for the specified user.
      *
-     * @param user The user for whom the playlist is to be created.
-     * @param name The name of the new playlist.
+     * @param user        The user for whom the playlist is to be created.
+     * @param name        The name of the new playlist.
      * @param description A description for the new playlist.
-     * @param isPublic A boolean indicating if the playlist should be public.
+     * @param isPublic    A boolean indicating if the playlist should be public.
      * @return The created Playlist object.
      * @throws IOException If there is an issue with the API request.
      */
@@ -27,7 +28,7 @@ public interface SpotifyAPIClient {
      * Adds songs to an existing playlist.
      *
      * @param playlist The playlist to which songs will be added.
-     * @param songs The list of songs to add to the playlist.
+     * @param songs    The list of songs to add to the playlist.
      * @throws IOException If there is an issue with the API request.
      */
     void addSongsToPlaylist(Playlist playlist, List<Song> songs) throws IOException;
@@ -44,15 +45,7 @@ public interface SpotifyAPIClient {
     /**
      * Authenticates the user and retrieves the access token (optional).
      */
-    void authenticate() throws IOException; // Optional method, can be used for getting access tokens
+    boolean authenticate() throws IOException; // Optional method, can be used for getting access tokens
 
-    /**
-     * Authenticates the user and retrieves an access token.
-     *
-     * @throws IOException If there is an issue with the authentication request.
-     * @throws AuthenticationException If the authentication process fails.
-     */
-    void authenticateUser() throws IOException, AuthenticationException;
 }
-
 
