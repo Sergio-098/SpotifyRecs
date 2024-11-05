@@ -56,8 +56,8 @@ public class Playlist {
         return songs;
     }
 
-    public void addSong(Song song) {
-        this.songs.add(song);
+    public void addSongs(List<Song> songs) {
+        this.songs.addAll(songs);
     }
 }
 
