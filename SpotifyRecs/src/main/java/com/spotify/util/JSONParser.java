@@ -1,4 +1,7 @@
 package com.spotify.util;
 
-public class JSONParser {
+import org.json.JSONObject;
+
+public interface JSONParser<T> {
+    T parse(JSONObject json);
 }
