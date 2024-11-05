@@ -1,15 +1,17 @@
 package com.spotify.models;
 
+import java.util.List;
+
 public class Song {
     private String songId;
     private String name;
-    private String artist;
+    private List <String> artists;
 
     // Constructor
-    public Song(String songId, String name, String artist) {
+    public Song(String songId, String name, List<String> artists) {
         this.songId = songId;
         this.name = name;
-        this.artist = artist;
+        this.setArtists(artists);
     }
 
     // Getters and Setters
@@ -29,11 +31,11 @@ public class Song {
         this.name = name;
     }
 
-    public String getArtist() {
-        return artist;
+    public List<String> getArtists() {
+        return artists;
     }
 
-    public void setArtist(String artist) {
-        this.artist = artist;
+    public void setArtists(List<String> artists) {
+        this.artists = artists;
     }
 }
