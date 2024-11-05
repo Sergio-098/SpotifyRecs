@@ -4,17 +4,19 @@ import com.spotify.models.Playlist;
 import com.spotify.models.RecommendationCriteria;
 import com.spotify.models.Song;
 import com.spotify.models.User;
+
 import java.io.IOException;
 import java.util.List;
 import java.util.Scanner;
 
-//Class to handle interactions with spotify web api
+// Class to handle interactions with Spotify Web API
 public class SpotifyClient implements SpotifyAPIClient {
     private final SpotifyAuthenticator authenticator;
     private String accessToken;
 
-    public SpotifyClient(String clientId, String clientSecret, String redirectUri) {
-        this.authenticator = new SpotifyAuthenticator(clientId, clientSecret, redirectUri);
+    public SpotifyClient(String clientId, String redirectUri) {
+        // Initialize SpotifyAuthenticator without clientSecret for PKCE
+        this.authenticator = new SpotifyAuthenticator(clientId, redirectUri);
     }
 
     @Override
@@ -26,6 +28,7 @@ public class SpotifyClient implements SpotifyAPIClient {
         Scanner scanner = new Scanner(System.in);
         String code = scanner.nextLine();
 
+        // Use PKCE method to exchange the code for tokens
         boolean success = authenticator.exchangeCodeForTokens(code);
         if (success) {
             this.accessToken = authenticator.getAccessToken();

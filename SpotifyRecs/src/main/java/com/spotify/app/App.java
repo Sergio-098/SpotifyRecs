@@ -5,12 +5,16 @@ import com.spotify.ui.PlaylistGeneratorUI;
 import com.spotify.api.SpotifyClient;
 import com.spotify.models.User;
 
+import java.io.IOException;
+
 public class App {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         System.out.println("Starting Spotify Playlist Generator...");
+        String clientID = "a54ea954b9fe41408a55d3a577126fa1";
+        String redirect = "http://localhost:8080/callback";
 
 
-        SpotifyClient spotifyClient = new SpotifyClient();
+        SpotifyClient spotifyClient = new SpotifyClient(clientID, redirect);
 
         if (spotifyClient.authenticate()) {
             System.out.println("User successfully authenticated!");

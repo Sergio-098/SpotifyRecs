@@ -14,30 +14,36 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
+import java.util.Random;
 
 public class SpotifyAuthenticator {
     private final String clientId;
-    private final String clientSecret;
     private final String redirectUri;
+    private String codeVerifier;
     private String accessToken;
     private String refreshToken;
 
-    public SpotifyAuthenticator(String clientId, String clientSecret, String redirectUri) {
+    public SpotifyAuthenticator(String clientId, String redirectUri) {
         this.clientId = clientId;
-        this.clientSecret = clientSecret;
         this.redirectUri = redirectUri;
+        this.codeVerifier = generateCodeVerifier();
     }
 
     public String getAuthorizationUrl() {
         try {
+            String codeChallenge = generateCodeChallenge(codeVerifier);
             return new URIBuilder("https://accounts.spotify.com/authorize")
                     .addParameter("client_id", clientId)
                     .addParameter("response_type", "code")
                     .addParameter("redirect_uri", redirectUri)
                     .addParameter("scope", "playlist-modify-public playlist-modify-private")
+                    .addParameter("code_challenge_method", "S256")
+                    .addParameter("code_challenge", codeChallenge)
                     .toString();
         } catch (Exception e) {
             throw new RuntimeException("Error building authorization URL", e);
@@ -47,42 +53,32 @@ public class SpotifyAuthenticator {
     public boolean exchangeCodeForTokens(String code) throws IOException {
         URI tokenUri = URI.create("https://accounts.spotify.com/api/token");
 
-        // Create an HttpClient
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
-            // Create an HttpPost request
             HttpPost post = new HttpPost(tokenUri);
-
-            // Add headers
             post.setHeader("Content-Type", "application/x-www-form-urlencoded");
 
-            // Set parameters for the request body
             List<BasicNameValuePair> params = new ArrayList<>();
             params.add(new BasicNameValuePair("grant_type", "authorization_code"));
             params.add(new BasicNameValuePair("code", code));
             params.add(new BasicNameValuePair("redirect_uri", redirectUri));
             params.add(new BasicNameValuePair("client_id", clientId));
-            params.add(new BasicNameValuePair("client_secret", clientSecret));
+            params.add(new BasicNameValuePair("code_verifier", codeVerifier));
 
-            // Set the entity with the parameters
             post.setEntity(new UrlEncodedFormEntity(params, StandardCharsets.UTF_8));
 
-            // Execute the POST request and get the response
             try (CloseableHttpResponse response = httpClient.execute(post);
                  BufferedReader reader = new BufferedReader(new InputStreamReader(response.getEntity().getContent()))) {
 
-                // Read the response and parse the JSON
                 StringBuilder responseBody = new StringBuilder();
                 String line;
                 while ((line = reader.readLine()) != null) {
                     responseBody.append(line);
                 }
 
-                // Parse the tokens from the response JSON
                 return parseTokens(responseBody.toString());
             }
         }
     }
-
 
     private boolean parseTokens(String jsonResponse) {
         JSONObject json = new JSONObject(jsonResponse);
@@ -98,29 +94,23 @@ public class SpotifyAuthenticator {
     public boolean refreshToken() {
         if (refreshToken == null) {
             System.out.println("Refresh token is not available. Cannot refresh access token.");
-            return false; // Exit the method if there's no refresh token
+            return false;
         }
         String url = "https://accounts.spotify.com/api/token";
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
             HttpPost post = new HttpPost(url);
-
-            // Add headers
-            String auth = clientId + ":" + clientSecret;
-            String encodedAuth = Base64.getEncoder().encodeToString(auth.getBytes(StandardCharsets.UTF_8));
-            post.setHeader("Authorization", "Basic " + encodedAuth);
             post.setHeader("Content-Type", "application/x-www-form-urlencoded");
 
-            // Set parameters for refresh token request
             List<BasicNameValuePair> params = new ArrayList<>();
             params.add(new BasicNameValuePair("grant_type", "refresh_token"));
             params.add(new BasicNameValuePair("refresh_token", refreshToken));
+            params.add(new BasicNameValuePair("client_id", clientId));
+
             post.setEntity(new UrlEncodedFormEntity(params, StandardCharsets.UTF_8));
 
-            // Execute the POST request
             try (CloseableHttpResponse response = httpClient.execute(post);
                  BufferedReader reader = new BufferedReader(new InputStreamReader(response.getEntity().getContent()))) {
 
-                // Read response and parse JSON
                 StringBuilder responseBody = new StringBuilder();
                 String line;
                 while ((line = reader.readLine()) != null) {
@@ -128,16 +118,31 @@ public class SpotifyAuthenticator {
                 }
                 JSONObject json = new JSONObject(responseBody.toString());
 
-                // Get new access token
                 if (json.has("access_token")) {
                     accessToken = json.getString("access_token");
-                    return true;  // Successful refresh
+                    return true;
                 }
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return false;  // Refresh failed
+        return false;
+    }
+
+    private String generateCodeVerifier() {
+        byte[] randomBytes = new byte[32];
+        new Random().nextBytes(randomBytes);
+        return Base64.getUrlEncoder().withoutPadding().encodeToString(randomBytes);
+    }
+
+    private String generateCodeChallenge(String verifier) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] hash = digest.digest(verifier.getBytes(StandardCharsets.US_ASCII));
+            return Base64.getUrlEncoder().withoutPadding().encodeToString(hash);
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException("SHA-256 algorithm not found", e);
+        }
     }
 
     public String getAccessToken() {
