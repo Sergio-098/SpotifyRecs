@@ -4,11 +4,18 @@ import com.spotify.models.Playlist;
 import com.spotify.models.RecommendationCriteria;
 import com.spotify.models.Song;
 import com.spotify.models.User;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.hc.core5.http.ParseException;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
+import org.json.JSONObject;
+
 import java.io.IOException;
 import java.util.List;
 import java.util.Scanner;
 
-//Class to handle interactions with spotify web api
 public class SpotifyClient implements SpotifyAPIClient {
     private final SpotifyAuthenticator authenticator;
     private String accessToken;
@@ -37,11 +44,37 @@ public class SpotifyClient implements SpotifyAPIClient {
         return success;
     }
 
+    public User getCurrentUser() throws IOException {
+        String url = "https://api.spotify.com/v1/me";
+        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+            HttpGet getRequest = new HttpGet(url);
+            getRequest.setHeader("Authorization", "Bearer " + accessToken);
+
+            try (CloseableHttpResponse response = httpClient.execute(getRequest)) {
+                if (response.getCode() == 200) {
+                    String jsonResponse = EntityUtils.toString(response.getEntity());
+                    return parseUser(jsonResponse);
+                } else {
+                    throw new IOException("Failed to get current user, status code: " + response.getCode());
+                }
+            }
+        } catch (ParseException e) {
+            throw new IOException("Error parsing response", e);
+        }
+    }
+
+    private User parseUser(String jsonResponse) {
+        JSONObject jsonObject = new JSONObject(jsonResponse);
+        String id = jsonObject.getString("id");
+        String displayName = jsonObject.optString("display_name", "No display name");
+
+        // Create and return a User object
+        return new User(id, displayName); // Adjust based on your User class constructor
+    }
+
     @Override
     public Playlist createPlaylist(User user, String name, String description, boolean isPublic) throws IOException {
         // Logic for creating a playlist using Spotify's API
-        // Example: Make an HTTP POST request to /v1/users/{user_id}/playlists
-        // Use accessToken in the header for authorization
         return new Playlist(); // Placeholder
     }
 
@@ -56,3 +89,4 @@ public class SpotifyClient implements SpotifyAPIClient {
         return List.of(); // Placeholder
     }
 }
+

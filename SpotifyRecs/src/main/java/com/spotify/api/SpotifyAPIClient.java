@@ -47,5 +47,11 @@ public interface SpotifyAPIClient {
      */
     boolean authenticate() throws IOException; // Optional method, can be used for getting access tokens
 
+    /**
+     * Returns current user info
+     * @return user object
+     * @throws IOException
+     */
+    User getCurrentUser() throws IOException;
 }
 
