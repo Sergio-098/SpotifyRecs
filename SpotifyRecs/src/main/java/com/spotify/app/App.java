@@ -22,10 +22,5 @@ public class App {
         } else {
             System.err.println("Authentication failed. Check credentials or authorization code.");
         }
-        // Initialize the UI with necessary components
-        PlaylistGeneratorUI playlistUI = new PlaylistGeneratorUI(spotifyClient, user);
-
-        // Start the user interface
-        playlistUI.start();
     }
 }

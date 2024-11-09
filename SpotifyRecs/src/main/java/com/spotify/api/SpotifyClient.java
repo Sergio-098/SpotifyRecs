@@ -1,29 +1,47 @@
 package com.spotify.api;
 
 import com.spotify.factory.SongFactory;
+import com.spotify.factory.UserFactory;
 import com.spotify.models.Playlist;
 import com.spotify.models.RecommendationCriteria;
 import com.spotify.models.Song;
 import com.spotify.models.User;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.hc.core5.http.ParseException;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
+import org.apache.hc.core5.http.io.entity.StringEntity;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+
 import java.util.List;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 
 // Class to handle interactions with Spotify Web API
-//We use APACHE http interactor version 5.3.1 to make api requests. ChatGPT can
-//help you get a good idea of how that will work specifically with the spotify api
-//since it is familiar with both.
 public class SpotifyClient implements SpotifyAPIClient {
+    private static final Logger logger = LoggerFactory.getLogger(SpotifyClient.class);
     private final SpotifyAuthenticator authenticator;
     private String accessToken;
+    private String refreshToken;
+    String auth = "Authorization";
+    String bearer = "Bearer ";
+    String ct = "Content-Type";
+    String app = "application/json";
+
 
     public SpotifyClient(String clientId, String redirectUri) {
         // Initialize SpotifyAuthenticator without clientSecret for PKCE
         this.authenticator = new SpotifyAuthenticator(clientId, redirectUri);
     }
 
+    //Uses SpotifyAuthenticator to allow us to access the user's info
     @Override
     public boolean authenticate() throws IOException {
         System.out.println("Authorize your account by visiting the following URL:");
@@ -37,6 +55,7 @@ public class SpotifyClient implements SpotifyAPIClient {
         boolean success = authenticator.exchangeCodeForTokens(code);
         if (success) {
             this.accessToken = authenticator.getAccessToken();
+            this.refreshToken = authenticator.getRefreshToken(); // Store refresh token
             System.out.println("Authentication successful!");
         } else {
             System.err.println("Failed to authenticate.");
@@ -45,47 +64,139 @@ public class SpotifyClient implements SpotifyAPIClient {
         return success;
     }
 
+    // Method to send HTTP GET requests to Spotify API. See other methods as
+    // example of how to use.
+    private JSONObject makeGetRequest(String url) throws IOException, ParseException {
+        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+            HttpGet get = new HttpGet(url);
+            get.setHeader(auth, bearer + accessToken);
+            get.setHeader(ct, app);
+
+            try (CloseableHttpResponse response = httpClient.execute(get)) {
+                String jsonResponse = EntityUtils.toString(response.getEntity());
+                return new JSONObject(jsonResponse);
+            }
+        }
+    }
+
+    // Method to send HTTP POST requests to Spotify API. See other methods as
+    // examples of how to use.
+    private JSONObject makePostRequest(String url, JSONObject requestBody) throws IOException {
+        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+            HttpPost post = new HttpPost(url);
+            post.setHeader(auth, bearer + accessToken);
+            post.setHeader(ct, app);
+            post.setEntity(new StringEntity(requestBody.toString()));
+
+            try (CloseableHttpResponse response = httpClient.execute(post)) {
+                String jsonResponse = EntityUtils.toString(response.getEntity());
+                return new JSONObject(jsonResponse);
+            } catch (ParseException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    //Method to ask Spotify to create a playlist for the User in question.
     @Override
     public Playlist createPlaylist(User user, String name, String description, boolean isPublic) throws IOException {
-        // Logic for creating a playlist using Spotify's API
-        // Example: Make an HTTP POST request to /v1/users/{user_id}/playlists
-        // Use accessToken in the header for authorization
-        // Placeholder until API request logic is written
-        //api response is the placeholder for the output from the api call
-        JSONObject json = new JSONObject(apiResponse);
-        String id = json.getString("id");
+        String url = "https://api.spotify.com/v1/users/" + user.getUserId() + "/playlists";
+
+        // Create JSON body for the request
+        JSONObject requestBody = new JSONObject();
+        requestBody.put("name", name);
+        requestBody.put("description", description);
+        requestBody.put("public", isPublic);
+
+        // Send the request
+        JSONObject jsonResponse = makePostRequest(url, requestBody);
+
+        // Parse the JSON response to get the playlist ID
+        String id = jsonResponse.getString("id");
+
+        // Return a new Playlist object with the obtained ID
         return new Playlist(id, name, description, isPublic);
     }
 
+    //Method to add the generated songs (or any song for that matter as long
+    //as it's in a list) to a specific playlist in our collection.
     @Override
     public void addSongsToPlaylist(Playlist playlist, List<Song> songs) throws IOException {
-        // Logic for adding songs to the playlist using the api but also storing
-        //the songs into a playlist object as needed.
-        String PlaylistID = playlist.getPlaylistId();
-        //ADD SONGS WITH API AS WELL BY LOOPING OVER LIST OF SONGS AND ACCESSING
-        //THEIR FIELD song.songId WHILE ADDING THEM TO PlaylistID
+        String playlistId = playlist.getPlaylistId();
+        String url = "https://api.spotify.com/v1/playlists/" + playlistId + "/tracks";
+
+        // Collect all song URIs into a list
+        List<String> uris = songs.stream()
+                .map(song -> "spotify:track:" + song.getSongId())
+                .collect(Collectors.toList());
+
+        // Create JSON body for the request
+        JSONObject requestBody = new JSONObject();
+        requestBody.put("uris", uris); // Add all song URIs in one request
+
+        // Send the request
+        JSONObject jsonResponse = makePostRequest(url, requestBody);
+
+        // Check for successful response (status code 201 for successful addition)
+        if (jsonResponse.has("error")) {
+            if (logger.isErrorEnabled()) {
+                logger.error("Failed to add songs: {}", jsonResponse.
+                        getJSONObject("error").getString("message"));
+            }
+            throw new IOException("Failed to add songs to playlist");
+        }
+
+        // Add songs to the local playlist object as well
         playlist.addSongs(songs);
     }
 
+    //Method to get the generated list of songs to put in the playlist.
     @Override
-    public List<Song> getRecommendations(RecommendationCriteria criteria) throws IOException {
-        // Logic for retrieving recommendations based on criteria
-        // Placeholder until implemented. To use SongFactory to create the list
-        //of songs returned
+    public List<Song> getRecommendations(RecommendationCriteria criteria) throws IOException, ParseException {
+        String genreIds = String.join(",", criteria.getGenreIds());
+        String artistIds = String.join(",", criteria.getArtistIds());
+        String trackIds = String.join(",", criteria.getTrackIds());
+
+        String recUrl = "https://api.spotify.com/v1/recommendations?"
+                + "seed_genres=" + genreIds
+                + "&seed_artists=" + artistIds
+                + "&seed_tracks=" + trackIds
+                + "&limit=20"
+                + "&min_popularity=50"
+                + "&max_popularity=70";
+
+        // Send the request
+        JSONObject jsonResponse = makeGetRequest(recUrl);
+        System.out.println(jsonResponse.toString());
+        // Parse the JSON response and create a list of Song objects
         SongFactory sf = new SongFactory();
-        //Variable apiResponse below is the json return from Get Recommendations call
-        //to the Spotify API
-        JSONObject recommendations = new JSONObject(apiResponse);
-        List<Song> allSongs = sf.createSongs(recommendations);
-        return allSongs;
+        return sf.createSongs(jsonResponse);
     }
 
+    //Get the info of the current user and return it as a user object
     @Override
-    public User getCurrentUser() throws IOException {
-        //grabs the current user's user object in case we need its ID or username,
-        //(like when we use the api to create and alter a playlist).
-        //Placeholders currently
-        User user = new User();
-        return user;
+    public User getCurrentUser() throws IOException, ParseException {
+        String userUrl = "https://api.spotify.com/v1/me";
+
+        // Send the request
+        JSONObject jsonResponse = makeGetRequest(userUrl);
+
+        // Parse the JSON response and create a User object
+        UserFactory uf = new UserFactory();
+        return uf.createUser(jsonResponse);
+    }
+
+    // Handle token expiration by refreshing the access token
+    private void refreshAccessToken() throws IOException {
+        String url = "https://accounts.spotify.com/api/token";
+        JSONObject requestBody = new JSONObject();
+        requestBody.put("grant_type", "refresh_token");
+        requestBody.put("refresh_token", refreshToken);
+
+        // Send POST request to refresh the token
+        JSONObject jsonResponse = makePostRequest(url, requestBody);
+
+        // Update access token
+        this.accessToken = jsonResponse.getString("access_token");
     }
 }
