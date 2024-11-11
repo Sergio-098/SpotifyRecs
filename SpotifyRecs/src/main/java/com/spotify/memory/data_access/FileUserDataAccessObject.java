@@ -6,11 +6,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import com.spotify.memory.logout.LogoutUserDataAccessInterface;
 import com.spotify.models.Playlist;
@@ -22,6 +18,13 @@ import com.spotify.factory.SongFactory;
 import com.spotify.memory.change_password.ChangePasswordUserDataAccessInterface;
 import com.spotify.memory.login.LoginUserDataAccessInterface;
 import com.spotify.memory.signup.SignupUserDataAccessInterface;
+
+//This is going to interact with the CSV files (basically excel spreadsheets) and
+//save all the information we need to them so that they don't get lost. It will
+//also be responsible for repopulating all the objects when we start the program
+//and loading them in so that we can pick right up where we left off between sessions.
+//It does this by taking all the data in the CSVs and creating the objects again.
+//Never edit the CSVs manually.
 
 public class FileUserDataAccessObject implements SignupUserDataAccessInterface,
         LoginUserDataAccessInterface,
@@ -44,6 +47,10 @@ public class FileUserDataAccessObject implements SignupUserDataAccessInterface,
     private final UserFactory userFactory;
     private final PlaylistFactory playlistFactory;
     private final SongFactory songFactory;
+
+    //This loads all the data back into out program so that it has all the user's
+    //information from previous sessions. It is used heavily in the app builder class
+    //under the app package. It is the same as lab 5.
 
     public FileUserDataAccessObject(String userCsvPath, String playlistCsvPath, String songCsvPath,
                                     UserFactory userFactory, PlaylistFactory playlistFactory, SongFactory songFactory) throws IOException {
@@ -148,12 +155,14 @@ public class FileUserDataAccessObject implements SignupUserDataAccessInterface,
         }
     }
 
+    //Saves all info
     private void save() throws IOException {
         saveUsers();
         savePlaylists();
         saveSongs();
     }
 
+    //saves user info
     private void saveUsers() throws IOException {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(userCsvFile))) {
             writer.write(USER_HEADER);
@@ -168,6 +177,7 @@ public class FileUserDataAccessObject implements SignupUserDataAccessInterface,
         }
     }
 
+    //saves playlist info
     private void savePlaylists() throws IOException {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(playlistCsvFile))) {
             writer.write(PLAYLIST_HEADER);
@@ -185,6 +195,7 @@ public class FileUserDataAccessObject implements SignupUserDataAccessInterface,
         }
     }
 
+    //saves song info
     private void saveSongs() throws IOException {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(songCsvFile))) {
             writer.write(SONG_HEADER);
@@ -202,6 +213,104 @@ public class FileUserDataAccessObject implements SignupUserDataAccessInterface,
                 }
             }
         }
+    }
+
+
+    public void addSongToPlaylist(String playlistId, Song newSong) throws IOException {
+        // Load the playlist from CSV
+        Playlist playlist = loadPlaylistById(playlistId);
+
+        // Add the new song to the playlist's song list
+        playlist.getSongs().add(newSong);
+
+        // Save the updated playlist back to the CSV
+        saveUpdatedPlaylist(playlist);
+    }
+
+    public void removeSongFromPlaylist(String playlistId, String songId) throws IOException {
+        // Load the playlist from CSV
+        Playlist playlist = loadPlaylistById(playlistId);
+
+        // Remove the song from the playlist's song list
+        playlist.getSongs().removeIf(song -> song.getSongId().equals(songId));
+
+        // Save the updated playlist back to the CSV
+        saveUpdatedPlaylist(playlist);
+    }
+
+    public Playlist loadPlaylistById(String playlistId) throws IOException {
+        // Read the CSV file and find the playlist with the given ID
+        BufferedReader reader = new BufferedReader(new FileReader("playlist_data.csv"));
+        String line;
+        Playlist playlist = null;
+
+        while ((line = reader.readLine()) != null) {
+            // Assuming CSV structure like: playlistId, playlistName, description, isPublic, songIds
+            String[] data = line.split(",");
+
+            if (data[0].equals(playlistId)) {
+                String playlistName = data[1];
+                String description = data[2];
+                boolean isPublic = Boolean.parseBoolean(data[3]);
+                List<Song> songs = parseSongs(data[4]); // Parse the song IDs from the CSV
+
+                playlist = new Playlist(playlistId, playlistName, description, isPublic, songs);
+                break;
+            }
+        }
+
+        reader.close();
+        return playlist;
+    }
+
+    private void saveUpdatedPlaylist(Playlist playlist) throws IOException {
+        // Write the updated playlist back to the CSV file
+        FileWriter writer = new FileWriter("playlist_data.csv", true); // Use append mode if needed
+        StringBuilder playlistData = new StringBuilder();
+
+        // Write the playlist's details in CSV format (adjust according to your CSV structure)
+        playlistData.append(playlist.getPlaylistId()).append(",")
+                .append(playlist.getName()).append(",")
+                .append(playlist.getDescription()).append(",")
+                .append(playlist.isPublic()).append(",")
+                .append(formatSongs(playlist.getSongs())).append("\n");
+
+        writer.write(playlistData.toString());
+        writer.close();
+    }
+
+    private String formatSongs(List<Song> songs) {
+        // Convert the list of songs to a CSV-compatible format (e.g., comma-separated song IDs)
+        StringBuilder songIds = new StringBuilder();
+        for (Song song : songs) {
+            songIds.append(song.getSongId()).append(",");
+        }
+        return songIds.toString();
+    }
+
+    private List<Song> parseSongs(String songData) {
+        List<Song> songs = new ArrayList<>();
+
+        String[] songEntries = songData.split(",");
+
+        for (String songEntry : songEntries) {
+            String[] songAttributes = songEntry.split("\\|");
+
+            if (songAttributes.length == 3) {
+                String songId = songAttributes[0];
+                String songName = songAttributes[1];
+                List<String> artists = parseArtists(songAttributes[2]); // Parse the artists from a comma-separated string
+
+                songs.add(new Song(songId, songName, artists)); // Create the Song object with the correct attributes
+            }
+        }
+        return songs;
+    }
+
+
+    private List<String> parseArtists(String artistsData) {
+        // Split the artist string by commas and return as a list
+        return new ArrayList<>(Arrays.asList(artistsData.split(",")));
     }
 
     @Override
