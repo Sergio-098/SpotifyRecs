@@ -7,12 +7,14 @@ public class User {
     private String userId;
     private String username;
     private List<Playlist> collection;
+    private Sting favourite;
 
     // Constructor
     public User(String userId, String username) {
         this.userId = userId;
         this.username = username;
         this.collection = new ArrayList<>();
+        this.favourite = "";
     }
 
     // Getters and Setters
@@ -39,4 +41,6 @@ public class User {
     public void addPlaylist(Playlist playlist) {
         this.collection.add(playlist);
     }
+
+    public String getFavourite() {return this.favourite;}
 }
