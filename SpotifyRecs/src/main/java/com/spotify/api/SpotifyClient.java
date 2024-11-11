@@ -1,5 +1,6 @@
 package com.spotify.api;
 
+import com.spotify.factory.PlaylistFactory;
 import com.spotify.factory.SongFactory;
 import com.spotify.factory.UserFactory;
 import com.spotify.models.Playlist;
@@ -20,6 +21,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 import java.util.stream.Collectors;
@@ -114,8 +116,10 @@ public class SpotifyClient implements SpotifyAPIClient {
         // Parse the JSON response to get the playlist ID
         String id = jsonResponse.getString("id");
 
+        List<Song> songs = new ArrayList<>();
+        PlaylistFactory pf = new PlaylistFactory();
         // Return a new Playlist object with the obtained ID
-        return new Playlist(id, name, description, isPublic);
+        return pf.createPlaylist(id, name, description, isPublic, songs);
     }
 
     //Method to add the generated songs (or any song for that matter as long
@@ -128,7 +132,7 @@ public class SpotifyClient implements SpotifyAPIClient {
         // Collect all song URIs into a list
         List<String> uris = songs.stream()
                 .map(song -> "spotify:track:" + song.getSongId())
-                .collect(Collectors.toList());
+                .toList();
 
         // Create JSON body for the request
         JSONObject requestBody = new JSONObject();

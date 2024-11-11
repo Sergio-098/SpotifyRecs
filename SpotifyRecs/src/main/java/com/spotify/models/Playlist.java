@@ -11,12 +11,12 @@ public class Playlist {
     private List<Song> songs;
 
     // Constructor
-    public Playlist(String playlistId, String name, String description, boolean isPublic) {
+    public Playlist(String playlistId, String name, String description, boolean isPublic, List<Song> songs) {
         this.playlistId = playlistId;
         this.name = name;
         this.description = description;
         this.isPublic = isPublic;
-        this.songs = new ArrayList<>();
+        this.songs = songs;
     }
 
     // Getters and Setters

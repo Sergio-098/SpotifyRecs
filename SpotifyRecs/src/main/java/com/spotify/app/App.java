@@ -1,9 +1,6 @@
 package com.spotify.app;
 
-import com.spotify.api.SpotifyAuthenticator;
-import com.spotify.ui.PlaylistGeneratorUI;
 import com.spotify.api.SpotifyClient;
-import com.spotify.models.User;
 
 import java.io.IOException;
 

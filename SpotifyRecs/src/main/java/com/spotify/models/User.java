@@ -2,17 +2,20 @@ package com.spotify.models;
 
 import java.util.ArrayList;
 import java.util.List;
+import com.spotify.models.Collection;
 
 public class User {
     private String userId;
     private String username;
-    private List<Playlist> collection;
+    private String password;
+    private Collection collection;
 
     // Constructor
-    public User(String userId, String username) {
+    public User(String userId, String username, String password, Collection collection) {
         this.userId = userId;
         this.username = username;
-        this.collection = new ArrayList<>();
+        this.password = password;
+        this.collection = collection;
     }
 
     // Getters and Setters
@@ -32,11 +35,19 @@ public class User {
         this.username = username;
     }
 
-    public List<Playlist> getCollection() {
+    public Collection getCollection() {
         return collection;
     }
 
     public void addPlaylist(Playlist playlist) {
-        this.collection.add(playlist);
+        this.collection.addPlaylist(playlist);
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 }
