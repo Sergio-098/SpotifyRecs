@@ -13,7 +13,7 @@ Users would like to sign in and link their Spotify account to the program so tha
 
 Users would like to save the generated playlist to their collection. Users use the program to add the playlist to their collection which they can access on their Spotify account. [Sergio’s story]
 
-User wants to find similar songs to one they like. User runs the program to generate a list of songs that are similar to the beat, genres and other criteria as the sample song. [Fawaz’s story]
+User has a playlist they already enjoy, and want another playlist of similar songs. User runs the program and program generates a new playlist with similar new songs. [Fawaz’s story]
 
 The user needs to input criteria into the recommendation algorithm. User sees genres and similar artists based on Constants provided in the code. User selects desired genres and similar artists to get more tailored recommendations. [Lola’s story]
 
