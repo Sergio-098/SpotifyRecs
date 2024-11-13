@@ -1,9 +1,6 @@
 package com.spotify.app;
 
-import com.spotify.api.SpotifyAuthenticator;
-import com.spotify.ui.PlaylistGeneratorUI;
 import com.spotify.api.SpotifyClient;
-import com.spotify.models.User;
 
 import java.io.IOException;
 
@@ -22,10 +19,5 @@ public class App {
         } else {
             System.err.println("Authentication failed. Check credentials or authorization code.");
         }
-        // Initialize the UI with necessary components
-        PlaylistGeneratorUI playlistUI = new PlaylistGeneratorUI(spotifyClient, user);
-
-        // Start the user interface
-        playlistUI.start();
     }
 }

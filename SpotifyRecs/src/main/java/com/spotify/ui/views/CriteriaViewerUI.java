@@ -1,4 +1,4 @@
-package com.spotify.ui;
+package com.spotify.ui.views;
 
 public class CriteriaViewerUI {
 }

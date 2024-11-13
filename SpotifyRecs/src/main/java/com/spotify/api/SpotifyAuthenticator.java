@@ -86,13 +86,13 @@ public class SpotifyAuthenticator {
             accessToken = json.getString("access_token");
         }
         if (json.has("refresh_token")) {
-            refreshToken = json.getString("refresh_token");
+            setRefreshToken(json.getString("refresh_token"));
         }
         return accessToken != null;
     }
 
     public boolean refreshToken() {
-        if (refreshToken == null) {
+        if (getRefreshToken() == null) {
             System.out.println("Refresh token is not available. Cannot refresh access token.");
             return false;
         }
@@ -103,7 +103,7 @@ public class SpotifyAuthenticator {
 
             List<BasicNameValuePair> params = new ArrayList<>();
             params.add(new BasicNameValuePair("grant_type", "refresh_token"));
-            params.add(new BasicNameValuePair("refresh_token", refreshToken));
+            params.add(new BasicNameValuePair("refresh_token", getRefreshToken()));
             params.add(new BasicNameValuePair("client_id", clientId));
 
             post.setEntity(new UrlEncodedFormEntity(params, StandardCharsets.UTF_8));
@@ -147,5 +147,13 @@ public class SpotifyAuthenticator {
 
     public String getAccessToken() {
         return accessToken;
+    }
+
+    public String getRefreshToken() {
+        return refreshToken;
+    }
+
+    public void setRefreshToken(String refreshToken) {
+        this.refreshToken = refreshToken;
     }
 }

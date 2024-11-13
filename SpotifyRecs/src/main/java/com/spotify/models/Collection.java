@@ -1,14 +1,13 @@
 package com.spotify.models;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class Collection {
     private List<Playlist> playlists;
 
     // Constructor
-    public Collection() {
-        this.playlists = new ArrayList<>();
+    public Collection(List<Playlist> playlists) {
+        this.playlists = playlists;
     }
 
     // Method to add a playlist to the collection
@@ -19,6 +18,10 @@ public class Collection {
     // Method to remove a playlist from the collection
     public boolean removePlaylist(String playlistId) {
         return playlists.removeIf(playlist -> playlist.getPlaylistId().equals(playlistId));
+    }
+
+    public List<Playlist> getPlaylists() {
+        return playlists;
     }
 
     // Method to get a playlist by its ID

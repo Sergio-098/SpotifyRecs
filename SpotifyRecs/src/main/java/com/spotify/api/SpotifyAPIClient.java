@@ -4,6 +4,7 @@ import com.spotify.models.Playlist;
 import com.spotify.models.RecommendationCriteria;
 import com.spotify.models.Song;
 import com.spotify.models.User;
+import org.apache.hc.core5.http.ParseException;
 
 import javax.naming.AuthenticationException;
 import java.io.IOException;
@@ -40,7 +41,7 @@ public interface SpotifyAPIClient {
      * @return A list of recommended Song objects.
      * @throws IOException If there is an issue with the API request.
      */
-    List<Song> getRecommendations(RecommendationCriteria criteria) throws IOException;
+    List<Song> getRecommendations(RecommendationCriteria criteria) throws IOException, ParseException;
 
     /**
      * Authenticates the user and retrieves the access token (optional).
@@ -52,6 +53,6 @@ public interface SpotifyAPIClient {
      * @return user object
      * @throws IOException
      */
-    User getCurrentUser() throws IOException;
+    User getCurrentUser() throws IOException, ParseException;
 }
 
