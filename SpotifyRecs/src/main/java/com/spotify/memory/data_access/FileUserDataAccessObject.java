@@ -240,26 +240,28 @@ public class FileUserDataAccessObject implements SignupUserDataAccessInterface,
 
     public Playlist loadPlaylistById(String playlistId) throws IOException {
         // Read the CSV file and find the playlist with the given ID
-        BufferedReader reader = new BufferedReader(new FileReader("playlist_data.csv"));
-        String line;
-        Playlist playlist = null;
+        Playlist playlist;
+        try (BufferedReader reader = new BufferedReader(new FileReader("playlist_data.csv"))) {
+            String line;
+            playlist = null;
 
-        while ((line = reader.readLine()) != null) {
-            // Assuming CSV structure like: playlistId, playlistName, description, isPublic, songIds
-            String[] data = line.split(",");
+            while ((line = reader.readLine()) != null) {
+                // Assuming CSV structure like: playlistId, playlistName, description, isPublic, songIds
+                String[] data = line.split(",");
 
-            if (data[0].equals(playlistId)) {
-                String playlistName = data[1];
-                String description = data[2];
-                boolean isPublic = Boolean.parseBoolean(data[3]);
-                List<Song> songs = parseSongs(data[4]); // Parse the song IDs from the CSV
+                if (data[0].equals(playlistId)) {
+                    String playlistName = data[1];
+                    String description = data[2];
+                    boolean isPublic = Boolean.parseBoolean(data[3]);
+                    List<Song> songs = parseSongs(data[4]); // Parse the song IDs from the CSV
 
-                playlist = new Playlist(playlistId, playlistName, description, isPublic, songs);
-                break;
+                    playlist = new Playlist(playlistId, playlistName, description, isPublic, songs);
+                    break;
+                }
             }
-        }
 
-        reader.close();
+            reader.close();
+        }
         return playlist;
     }
 
