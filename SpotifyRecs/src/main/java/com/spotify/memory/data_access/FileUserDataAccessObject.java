@@ -6,6 +6,8 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
 
 import com.spotify.memory.logout.LogoutUserDataAccessInterface;
@@ -227,6 +229,10 @@ public class FileUserDataAccessObject implements SignupUserDataAccessInterface,
         saveUpdatedPlaylist(playlist);
     }
 
+    public void savePlaylist() throws IOException {
+        save();
+    }
+
     public void removeSongFromPlaylist(String playlistId, String songId) throws IOException {
         // Load the playlist from CSV
         Playlist playlist = loadPlaylistById(playlistId);
@@ -267,18 +273,19 @@ public class FileUserDataAccessObject implements SignupUserDataAccessInterface,
 
     private void saveUpdatedPlaylist(Playlist playlist) throws IOException {
         // Write the updated playlist back to the CSV file
-        FileWriter writer = new FileWriter("playlist_data.csv", true); // Use append mode if needed
-        StringBuilder playlistData = new StringBuilder();
+        try (FileWriter writer = new FileWriter("playlist_data.csv", true)) {
+            StringBuilder playlistData = new StringBuilder();
 
-        // Write the playlist's details in CSV format (adjust according to your CSV structure)
-        playlistData.append(playlist.getPlaylistId()).append(",")
-                .append(playlist.getName()).append(",")
-                .append(playlist.getDescription()).append(",")
-                .append(playlist.isPublic()).append(",")
-                .append(formatSongs(playlist.getSongs())).append("\n");
+            // Write the playlist's details in CSV format (adjust according to your CSV structure)
+            playlistData.append(playlist.getPlaylistId()).append(",")
+                    .append(playlist.getName()).append(",")
+                    .append(playlist.getDescription()).append(",")
+                    .append(playlist.isPublic()).append(",")
+                    .append(formatSongs(playlist.getSongs())).append("\n");
 
-        writer.write(playlistData.toString());
-        writer.close();
+            writer.write(playlistData.toString());
+            writer.close();
+        } // Use append mode if needed
     }
 
     private String formatSongs(List<Song> songs) {
