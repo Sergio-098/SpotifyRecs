@@ -15,6 +15,7 @@ import org.apache.hc.client5.http.impl.classic.HttpClients;
 import org.apache.hc.core5.http.ParseException;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.apache.hc.core5.http.io.entity.StringEntity;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -188,6 +189,49 @@ public class SpotifyClient implements SpotifyAPIClient {
         // Parse the JSON response and create a User object
         UserFactory uf = new UserFactory();
         return uf.createUser(jsonResponse);
+    }
+
+    public String getSearchArtist(String artist) throws IOException, ParseException {
+        String baseArtist = "https://api.spotify.com/v1/search";
+        String[] a = artist.split("\\s+");
+        String aa = "";
+        for (int i = 0; i < a.length; i++) {
+            aa = aa.concat(a[i]);
+            if (1 < a.length - i) {
+                aa = aa.concat("+");
+            }
+        }
+        String endpoint = baseArtist +
+                "?q=artist%3A" + aa + "&type=artist&market=CA&limit=1";
+        JSONObject jsonResponse = makeGetRequest(endpoint);
+        return jsonResponse.getJSONObject("artists").getJSONArray("items").getJSONObject(0).getString("id");
+    }
+
+    public String getSearchSong(String artist) throws IOException, ParseException {
+        String baseSong = "https://api.spotify.com/v1/search";
+        String[] a = artist.split("\\s+");
+        String aa = "";
+        for (int i = 0; i < a.length; i++) {
+            aa = aa.concat(a[i]);
+            if (1 < a.length - i) {
+                aa = aa.concat("+");
+            }
+        }
+        String endpoint = baseSong +
+                "?q=track%3a" + aa + "&type=track&market=CA&limit=1";
+        JSONObject jsonResponse = makeGetRequest(endpoint);
+        return jsonResponse.getJSONObject("tracks").getJSONArray("items").getJSONObject(0).getString("id");
+    }
+
+    public List<String> getGenres() throws IOException, ParseException {
+        String baseGenre = "https://api.spotify.com/v1/recommendations/available-genre-seeds";
+        JSONObject jsonResponse = makeGetRequest(baseGenre);
+        JSONArray genresArray = jsonResponse.getJSONArray("genres");
+        List<String> genresList = new ArrayList<>();
+        for (int i = 0; i < genresArray.length(); i++) {
+            genresList.add(genresArray.getString(i));
+        }
+        return genresList;
     }
 
     // Handle token expiration by refreshing the access token
