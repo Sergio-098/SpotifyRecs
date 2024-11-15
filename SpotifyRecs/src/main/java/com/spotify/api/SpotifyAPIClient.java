@@ -41,7 +41,7 @@ public interface SpotifyAPIClient {
      * @return A list of recommended Song objects.
      * @throws IOException If there is an issue with the API request.
      */
-    List<Song> getRecommendations(RecommendationCriteria criteria) throws IOException, ParseException;
+    List<Song> getRecommendations(RecommendationCriteria criteria, Integer num) throws IOException, ParseException;
 
     /**
      * Authenticates the user and retrieves the access token (optional).

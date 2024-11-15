@@ -156,7 +156,7 @@ public class SpotifyClient implements SpotifyAPIClient {
 
     //Method to get the generated list of songs to put in the playlist.
     @Override
-    public List<Song> getRecommendations(RecommendationCriteria criteria) throws IOException, ParseException {
+    public List<Song> getRecommendations(RecommendationCriteria criteria, Integer num) throws IOException, ParseException {
         String genreIds = String.join(",", criteria.getGenreIds());
         String artistIds = String.join(",", criteria.getArtistIds());
         String trackIds = String.join(",", criteria.getTrackIds());
@@ -165,7 +165,7 @@ public class SpotifyClient implements SpotifyAPIClient {
                 + "seed_genres=" + genreIds
                 + "&seed_artists=" + artistIds
                 + "&seed_tracks=" + trackIds
-                + "&limit=20"
+                + "&limit=" + num.toString()
                 + "&min_popularity=50"
                 + "&max_popularity=70";
 
