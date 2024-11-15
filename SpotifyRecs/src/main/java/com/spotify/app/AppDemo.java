@@ -34,19 +34,24 @@ public class AppDemo {
             System.out.println("User successfully authenticated!");
             // Now you can use spotifyClient to make authorized API calls
 
-            System.out.println("What is your seed artist: ");
+            System.out.println("What is your seed artist id: ");
+            String artist = scanner.nextLine();
 
-            String crit = scanner.nextLine();
+            System.out.println("What is your seed genre id: ");
+            String genre = scanner.nextLine();
 
-            System.out.println("Generating playlist based on " + crit + "...");
+            System.out.println("What is your seed song id: ");
+            String track = scanner.nextLine();
+
+            System.out.println("Generating playlist...");
 
             //this is a placeholder for the search use case
             List<String> artists = new ArrayList<>();
             List<String> genres = new ArrayList<>();
             List<String> tracks = new ArrayList<>();
-            artists.add("1ybINI1qPiFbwDXamRtwxD"); //smino
-            genres.add("hiphop"); //rap
-            tracks.add("4LLNd36WeJKv8pzjGeoMXZ"); //backstage pass by smino
+            artists.add(artist);
+            genres.add(genre);
+            tracks.add(track);
 
             //generate use case
             List<Song> songs = gen.execute(artists, genres, tracks);
