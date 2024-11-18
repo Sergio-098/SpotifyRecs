@@ -15,12 +15,8 @@ public class MemoryDemo {
         final AppBuilder appBuilder = new AppBuilder();
         final JFrame application = appBuilder
                 .addLoginView()
-                .addSignupView()
                 .addLoggedInView()
-                .addLogoutUseCase()
-                .addSignupUseCase()
                 .addLoginUseCase()
-                .addChangePasswordUseCase()
                 .build();
 
         application.pack();

@@ -1,11 +1,11 @@
 package com.spotify.repositories;
 
-import com.spotify.factory.PlaylistFactory;
-import com.spotify.factory.SongFactory;
-import com.spotify.factory.UserFactory;
-import com.spotify.memory.data_access.FileUserDataAccessObject;
-import com.spotify.models.Playlist;
-import com.spotify.models.User;
+import com.spotify.entity.PlaylistFactory;
+import com.spotify.entity.SongFactory;
+import com.spotify.entity.UserFactory;
+import com.spotify.data_access.FileUserDataAccessObject;
+import com.spotify.entity.Playlist;
+import com.spotify.entity.User;
 
 import java.io.IOException;
 

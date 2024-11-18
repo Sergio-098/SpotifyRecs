@@ -1,12 +1,11 @@
 package com.spotify.api;
 
-import com.spotify.models.Playlist;
-import com.spotify.models.RecommendationCriteria;
-import com.spotify.models.Song;
-import com.spotify.models.User;
+import com.spotify.entity.Playlist;
+import com.spotify.entity.RecommendationCriteria;
+import com.spotify.entity.Song;
+import com.spotify.entity.User;
 import org.apache.hc.core5.http.ParseException;
 
-import javax.naming.AuthenticationException;
 import java.io.IOException;
 import java.util.List;
 

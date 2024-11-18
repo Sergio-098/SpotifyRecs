@@ -1,7 +1,7 @@
 package com.spotify.repositories;
 
-import com.spotify.models.Playlist;
-import com.spotify.models.User;
+import com.spotify.entity.Playlist;
+import com.spotify.entity.User;
 
 import java.io.IOException;
 
