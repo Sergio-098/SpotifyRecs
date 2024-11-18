@@ -24,7 +24,6 @@ public class SaveUseCase {
         spotifyClient.addSongsToPlaylist(spotifyPlaylist, songs);
         // Save to local Collection
         playlistRepository.save(spotifyPlaylist, user);
-
         return spotifyPlaylist;
     }
 }

@@ -120,7 +120,7 @@ public class SpotifyClient implements SpotifyAPIClient {
         List<Song> songs = new ArrayList<>();
         PlaylistFactory pf = new PlaylistFactory();
         // Return a new Playlist object with the obtained ID
-        return pf.createPlaylist(id, name, description, isPublic, songs);
+        return pf.createPlaylist(id, name, description, isPublic, songs, user);
     }
 
     //Method to add the generated songs (or any song for that matter as long

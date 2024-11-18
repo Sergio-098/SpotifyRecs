@@ -1,20 +1,16 @@
 package com.spotify.models;
 
-import java.util.ArrayList;
-import java.util.List;
 import com.spotify.models.Collection;
 
 public class User {
     private String userId;
     private String username;
-    private String password;
     private Collection collection;
 
     // Constructor
-    public User(String userId, String username, String password, Collection collection) {
+    public User(String userId, String username, Collection collection) {
         this.userId = userId;
         this.username = username;
-        this.password = password;
         this.collection = collection;
     }
 
@@ -40,14 +36,6 @@ public class User {
     }
 
     public void addPlaylist(Playlist playlist) {
-        this.collection.addPlaylist(playlist);
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
+        collection.addPlaylist(playlist);
     }
 }

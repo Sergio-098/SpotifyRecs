@@ -6,20 +6,14 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.*;
 
-import com.spotify.memory.logout.LogoutUserDataAccessInterface;
 import com.spotify.models.Playlist;
 import com.spotify.models.Song;
 import com.spotify.models.User;
 import com.spotify.factory.UserFactory;
 import com.spotify.factory.PlaylistFactory;
 import com.spotify.factory.SongFactory;
-import com.spotify.memory.change_password.ChangePasswordUserDataAccessInterface;
-import com.spotify.memory.login.LoginUserDataAccessInterface;
-import com.spotify.memory.signup.SignupUserDataAccessInterface;
 
 //This is going to interact with the CSV files (basically excel spreadsheets) and
 //save all the information we need to them so that they don't get lost. It will
@@ -28,10 +22,7 @@ import com.spotify.memory.signup.SignupUserDataAccessInterface;
 //It does this by taking all the data in the CSVs and creating the objects again.
 //Never edit the CSVs manually.
 
-public class FileUserDataAccessObject implements SignupUserDataAccessInterface,
-        LoginUserDataAccessInterface,
-        ChangePasswordUserDataAccessInterface,
-        LogoutUserDataAccessInterface {
+public class FileUserDataAccessObject {
 
     private static final String USER_HEADER = "username,password,userId";
     private static final String PLAYLIST_HEADER = "userId,playlistId,name,description,isPublic";
@@ -44,6 +35,8 @@ public class FileUserDataAccessObject implements SignupUserDataAccessInterface,
     private final Map<String, Integer> playlistHeaders = new LinkedHashMap<>();
     private final Map<String, Integer> songHeaders = new LinkedHashMap<>();
     private final Map<String, User> accounts = new HashMap<>();
+    private final Map<String, Playlist> playlists = new HashMap<>();
+    private final Map<String, Song> songs = new HashMap<>();
     private String currentUsername;
 
     private final UserFactory userFactory;
@@ -66,8 +59,7 @@ public class FileUserDataAccessObject implements SignupUserDataAccessInterface,
 
         // Initialize headers
         userHeaders.put("username", 0);
-        userHeaders.put("password", 1);
-        userHeaders.put("userId", 2);
+        userHeaders.put("userId", 1);
 
         playlistHeaders.put("userId", 0);
         playlistHeaders.put("playlistId", 1);
@@ -92,9 +84,8 @@ public class FileUserDataAccessObject implements SignupUserDataAccessInterface,
                 while ((row = reader.readLine()) != null) {
                     final String[] col = row.split(",");
                     final String username = col[userHeaders.get("username")];
-                    final String password = col[userHeaders.get("password")];
                     final String userId = col[userHeaders.get("userId")];
-                    User user = userFactory.initUser(username, password);
+                    User user = userFactory.initUser(username);
                     user.setUserId(userId);
                     accounts.put(username, user);
                 }
@@ -115,7 +106,8 @@ public class FileUserDataAccessObject implements SignupUserDataAccessInterface,
                     final boolean isPublic = Boolean.parseBoolean(col[playlistHeaders.get("isPublic")]);
 
                     List<Song> songs = new ArrayList<>();
-                    Playlist playlist = playlistFactory.createPlaylist(name, playlistId, description, isPublic, songs);
+                    Playlist playlist = new Playlist (name, playlistId, description, isPublic, songs, userId);
+                    playlists.put(userId, playlist);
 
                     // Find the user and add the playlist
                     for (User user : accounts.values()) {
@@ -142,6 +134,7 @@ public class FileUserDataAccessObject implements SignupUserDataAccessInterface,
                     List<String> artistList = List.of(artists.split("\\|"));
 
                     Song song = new Song(songId, name, artistList);
+                    songs.put(playlistId, song);
 
                     // Find the playlist and add the song
                     for (User user : accounts.values()) {
@@ -171,8 +164,8 @@ public class FileUserDataAccessObject implements SignupUserDataAccessInterface,
             writer.newLine();
 
             for (User user : accounts.values()) {
-                final String line = String.format("%s,%s,%s",
-                        user.getUsername(), user.getPassword(), user.getUserId());
+                final String line = String.format("%s,%s",
+                        user.getUsername(), user.getUserId());
                 writer.write(line);
                 writer.newLine();
             }
@@ -229,10 +222,6 @@ public class FileUserDataAccessObject implements SignupUserDataAccessInterface,
         saveUpdatedPlaylist(playlist);
     }
 
-    public void savePlaylist() throws IOException {
-        save();
-    }
-
     public void removeSongFromPlaylist(String playlistId, String songId) throws IOException {
         // Load the playlist from CSV
         Playlist playlist = loadPlaylistById(playlistId);
@@ -256,12 +245,13 @@ public class FileUserDataAccessObject implements SignupUserDataAccessInterface,
                 String[] data = line.split(",");
 
                 if (data[0].equals(playlistId)) {
+                    String userId = data[0];
                     String playlistName = data[1];
                     String description = data[2];
                     boolean isPublic = Boolean.parseBoolean(data[3]);
                     List<Song> songs = parseSongs(data[4]); // Parse the song IDs from the CSV
 
-                    playlist = new Playlist(playlistId, playlistName, description, isPublic, songs);
+                    playlist = new Playlist(playlistId, playlistName, description, isPublic, songs, userId);
                     break;
                 }
             }
@@ -322,35 +312,24 @@ public class FileUserDataAccessObject implements SignupUserDataAccessInterface,
         return new ArrayList<>(Arrays.asList(artistsData.split(",")));
     }
 
-    @Override
     public void save(User user) throws IOException {
         accounts.put(user.getUsername(), user);
         save();
     }
 
-    @Override
     public User get(String username) {
         return accounts.get(username);
     }
 
-    @Override
     public void setCurrentUsername(String name) {
         this.currentUsername = name;
     }
 
-    @Override
     public String getCurrentUsername() {
         return this.currentUsername;
     }
 
-    @Override
     public boolean existsByName(String identifier) {
         return accounts.containsKey(identifier);
-    }
-
-    @Override
-    public void changePassword(User user) throws IOException {
-        accounts.put(user.getUsername(), user);
-        save();
     }
 }

@@ -16,12 +16,11 @@ public class UserFactory {
         Map<String, String> userInfo = userParse.parse(json);
         List<Playlist> playlists = new ArrayList<>();
         Collection emptyCollection = new Collection(playlists);
-        return new User(userInfo.get("id"), userInfo.get("username"),
-                null, emptyCollection);
+        return new User(userInfo.get("id"), userInfo.get("username"), emptyCollection);
     }
-    public User initUser(String username, String password) {
+    public User initUser(String username){
         List<Playlist> playlists = new ArrayList<>();
         Collection emptyCollection = new Collection(playlists);
-        return new User(null, username, password, emptyCollection);
+        return new User(null, username, emptyCollection);
     }
 }

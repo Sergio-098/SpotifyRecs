@@ -1,22 +1,23 @@
 package com.spotify.models;
 
 import java.util.List;
-import java.util.ArrayList;
 
 public class Playlist {
     private String playlistId;
+    private String userId;
     private String name;
     private String description;
     private boolean isPublic;
     private List<Song> songs;
 
     // Constructor
-    public Playlist(String playlistId, String name, String description, boolean isPublic, List<Song> songs) {
+    public Playlist(String playlistId, String name, String description, boolean isPublic, List<Song> songs, String user) {
         this.playlistId = playlistId;
         this.name = name;
         this.description = description;
         this.isPublic = isPublic;
         this.songs = songs;
+        this.userId = user;
     }
 
     // Getters and Setters
@@ -58,6 +59,14 @@ public class Playlist {
 
     public void addSongs(List<Song> songs) {
         this.songs.addAll(songs);
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 }
 

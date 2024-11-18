@@ -4,6 +4,7 @@ import com.spotify.factory.RecCritFactory;
 import com.spotify.models.*;
 import com.spotify.api.SpotifyClient;
 import com.spotify.repositories.FilePlaylistRepository;
+import com.spotify.repositories.FileUserRepository;
 import com.spotify.use_cases.generate_use_case.GenerateUseCase;
 import com.spotify.use_cases.save_playlist.SaveUseCase;
 import org.apache.hc.core5.http.ParseException;
@@ -23,6 +24,7 @@ public class AppDemo {
 
         SpotifyClient spotifyClient = new SpotifyClient(clientID, redirect);
         FilePlaylistRepository fplRepo = new FilePlaylistRepository();
+        FileUserRepository fuRepo = new FileUserRepository();
 
         GenerateUseCase gen = new GenerateUseCase(spotifyClient);
         SaveUseCase save = new SaveUseCase(spotifyClient, fplRepo);
@@ -30,6 +32,7 @@ public class AppDemo {
         if (spotifyClient.authenticate()) {
 
             User user = spotifyClient.getCurrentUser();
+            fuRepo.save(user);
 
             System.out.println("User successfully authenticated!");
             // Now you can use spotifyClient to make authorized API calls
@@ -102,10 +105,11 @@ public class AppDemo {
                     String remove = scanner.nextLine();
                     songs.removeIf(song -> song.getName().equalsIgnoreCase(remove));
                 //Case where you don't want to save the playlist at all and you return to the home screen
-                } else {
+                } else if (savePlaylist.equals("no")) {
                     break;
+                }else {
+                    System.out.println("Invalid choice");
                 }
-
             }
 
             System.out.println("Thank you for using our program :)");
