@@ -1,0 +1,8 @@
+package com.spotify.interface_adapter.remove_song;
+
+public class RemoveSongViewModel {
+}
+
+/**
+ * The Login Interactor.
+ */
