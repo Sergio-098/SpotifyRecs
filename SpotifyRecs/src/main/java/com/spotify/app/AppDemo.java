@@ -1,12 +1,12 @@
 package com.spotify.app;
 
-import com.spotify.factory.RecCritFactory;
-import com.spotify.models.*;
+import com.spotify.entity.RecommendationCriteriaFactory;
+import com.spotify.entity.*;
 import com.spotify.api.SpotifyClient;
 import com.spotify.repositories.FilePlaylistRepository;
 import com.spotify.repositories.FileUserRepository;
-import com.spotify.use_cases.generate_use_case.GenerateUseCase;
-import com.spotify.use_cases.save_playlist.SaveUseCase;
+import com.spotify.use_case.generate.GenerateUseCase;
+import com.spotify.use_case.save_playlist.SavePlaylistUseCase;
 import org.apache.hc.core5.http.ParseException;
 
 import java.io.IOException;
@@ -27,7 +27,7 @@ public class AppDemo {
         FileUserRepository fuRepo = new FileUserRepository();
 
         GenerateUseCase gen = new GenerateUseCase(spotifyClient);
-        SaveUseCase save = new SaveUseCase(spotifyClient, fplRepo);
+        SavePlaylistUseCase save = new SavePlaylistUseCase(spotifyClient, fplRepo);
 
         if (spotifyClient.authenticate()) {
 
@@ -64,6 +64,7 @@ public class AppDemo {
             List<Song> songs = gen.execute(artists, genres, tracks);
             System.out.println("Here is your generated playlist");
 
+            label:
             while (true) {
                 for (Song song : songs) {
                     System.out.println(song.getName() + " by " + song.getArtists().getFirst());
@@ -76,39 +77,44 @@ public class AppDemo {
                 String savePlaylist = scanner.nextLine();
 
                 //save use case
-                if (savePlaylist.equals("save")) {
-                    System.out.println("Enter playlist name:");
-                    String name = scanner.nextLine();
-                    System.out.println("Enter playlist description:");
-                    String description = scanner.nextLine();
-                    System.out.println("Do you want it to be public? type y/n");
-                    if (scanner.nextLine().equals("y")) {
-                        System.out.println("Saving generated playlist...");
-                        save.execute(name, description, songs, true, user);
-                    } else {
-                        System.out.println("Saving generated playlist...");
-                        save.execute(name, description, songs, false, user);                    }
-                    break;
+                switch (savePlaylist) {
+                    case "save":
+                        System.out.println("Enter playlist name:");
+                        String name = scanner.nextLine();
+                        System.out.println("Enter playlist description:");
+                        String description = scanner.nextLine();
+                        System.out.println("Do you want it to be public? type y/n");
+                        if (scanner.nextLine().equals("y")) {
+                            System.out.println("Saving generated playlist...");
+                            save.execute(name, description, songs, true, user);
+                        } else {
+                            System.out.println("Saving generated playlist...");
+                            save.execute(name, description, songs, false, user);
+                        }
+                        break label;
 
-                //Add Songs use case
-                }else if (savePlaylist.equals("add")) {
-                    System.out.println("How many songs:");
-                    String number = scanner.nextLine();
-                    Integer num = Integer.valueOf(number);
-                    RecCritFactory rc = new RecCritFactory();
-                    RecommendationCriteria recCriteria = rc.createRecCrit(artists, genres, tracks);
-                    List<Song> newSongs = spotifyClient.getRecommendations(recCriteria, num);
-                    songs.addAll(newSongs);
-                //Delete Songs use case
-                } else if (savePlaylist.equals("delete")) {
-                    System.out.println("Which song would you like to delete?:");
-                    String remove = scanner.nextLine();
-                    songs.removeIf(song -> song.getName().equalsIgnoreCase(remove));
-                //Case where you don't want to save the playlist at all and you return to the home screen
-                } else if (savePlaylist.equals("no")) {
-                    break;
-                }else {
-                    System.out.println("Invalid choice");
+                    //Add Songs use case
+                    case "add":
+                        System.out.println("How many songs:");
+                        String number = scanner.nextLine();
+                        Integer num = Integer.valueOf(number);
+                        RecommendationCriteriaFactory rc = new RecommendationCriteriaFactory();
+                        RecommendationCriteria recCriteria = rc.createRecCrit(artists, genres, tracks);
+                        List<Song> newSongs = spotifyClient.getRecommendations(recCriteria, num);
+                        songs.addAll(newSongs);
+                        //Delete Songs use case
+                        break;
+                    case "delete":
+                        System.out.println("Which song would you like to delete?:");
+                        String remove = scanner.nextLine();
+                        songs.removeIf(song -> song.getName().equalsIgnoreCase(remove));
+                        //Case where you don't want to save the playlist at all and you return to the home screen
+                        break;
+
+                    case "no":
+                        break label;
+                    default:
+                        System.out.println("Invalid Choice");
                 }
             }
 

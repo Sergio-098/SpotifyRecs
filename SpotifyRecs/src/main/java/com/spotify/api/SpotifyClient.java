@@ -1,12 +1,12 @@
 package com.spotify.api;
 
-import com.spotify.factory.PlaylistFactory;
-import com.spotify.factory.SongFactory;
-import com.spotify.factory.UserFactory;
-import com.spotify.models.Playlist;
-import com.spotify.models.RecommendationCriteria;
-import com.spotify.models.Song;
-import com.spotify.models.User;
+import com.spotify.entity.PlaylistFactory;
+import com.spotify.entity.SongFactory;
+import com.spotify.entity.UserFactory;
+import com.spotify.entity.Playlist;
+import com.spotify.entity.RecommendationCriteria;
+import com.spotify.entity.Song;
+import com.spotify.entity.User;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
@@ -25,7 +25,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
-import java.util.stream.Collectors;
 
 // Class to handle interactions with Spotify Web API
 public class SpotifyClient implements SpotifyAPIClient {
@@ -174,8 +173,8 @@ public class SpotifyClient implements SpotifyAPIClient {
         JSONObject jsonResponse = makeGetRequest(recUrl);
         System.out.println(jsonResponse.toString());
         // Parse the JSON response and create a list of Song objects
-        SongFactory sf = new SongFactory();
-        return sf.createSongs(jsonResponse);
+        SongFactory songFactory = new SongFactory();
+        return songFactory.createSongs(jsonResponse);
     }
 
     //Get the info of the current user and return it as a user object
