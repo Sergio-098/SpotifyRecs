@@ -5,6 +5,7 @@ import com.spotify.entity.*;
 import com.spotify.api.SpotifyClient;
 import com.spotify.repositories.FilePlaylistRepository;
 import com.spotify.repositories.FileUserRepository;
+import com.spotify.use_case.authorize.AuthorizeUseCase;
 import com.spotify.use_case.generate.GenerateUseCase;
 import com.spotify.use_case.save_playlist.SavePlaylistUseCase;
 import org.apache.hc.core5.http.ParseException;
@@ -28,8 +29,9 @@ public class AppDemo {
 
         GenerateUseCase gen = new GenerateUseCase(spotifyClient);
         SavePlaylistUseCase save = new SavePlaylistUseCase(spotifyClient, fplRepo);
+        AuthorizeUseCase auth = new AuthorizeUseCase(spotifyClient);
 
-        if (spotifyClient.authenticate()) {
+        if (auth.execute()) {
 
             User user = spotifyClient.getCurrentUser();
             fuRepo.save(user);
