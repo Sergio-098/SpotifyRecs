@@ -31,7 +31,7 @@ public class AppDemo {
         SavePlaylistUseCase save = new SavePlaylistUseCase(spotifyClient, fplRepo);
         AuthorizeUseCase auth = new AuthorizeUseCase(spotifyClient);
 
-        if (auth.execute()) {
+        if (auth.execute2()) {
 
             User user = spotifyClient.getCurrentUser();
             fuRepo.save(user);

@@ -1,7 +1,6 @@
 package com.spotify.use_case.authorize;
 
 import com.spotify.api.SpotifyClient;
-
 import java.io.IOException;
 
 public class AuthorizeUseCase {
@@ -10,7 +9,10 @@ public class AuthorizeUseCase {
     public AuthorizeUseCase(SpotifyClient spotifyClient) {
         this.spotifyClient = spotifyClient;
     }
-    public boolean execute() throws IOException {
-        return spotifyClient.authenticate();
+    public boolean execute(String code) throws IOException {
+        return spotifyClient.authorize(code);
+    }
+    public boolean execute2() throws IOException {
+        this.spotifyClient.authenticate();
     }
 }

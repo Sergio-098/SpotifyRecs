@@ -54,7 +54,11 @@ public class SpotifyClient implements SpotifyAPIClient {
         String code = scanner.nextLine();
 
         // Use PKCE method to exchange the code for tokens
-        boolean success = authenticator.exchangeCodeForTokens(code);
+        return authorize(code);
+    }
+
+    public boolean authorize(String accessCode) throws IOException {
+        boolean success = authenticator.exchangeCodeForTokens(accessCode);
         if (success) {
             this.accessToken = authenticator.getAccessToken();
             this.refreshToken = authenticator.getRefreshToken(); // Store refresh token
@@ -64,6 +68,14 @@ public class SpotifyClient implements SpotifyAPIClient {
         }
 
         return success;
+    }
+
+    public String getAuthorizationUrl(){
+        return authenticator.getAuthorizationUrl();
+    }
+
+    public String getAccessToken() {
+        return accessToken;
     }
 
     // Method to send HTTP GET requests to Spotify API. See other methods as

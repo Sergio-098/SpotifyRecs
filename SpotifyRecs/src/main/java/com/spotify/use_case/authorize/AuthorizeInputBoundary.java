@@ -1,5 +1,5 @@
 package com.spotify.use_case.authorize;
 
-public class AuthorizeInputBoundary {
+public interface AuthorizeInputBoundary {
 
 }
