@@ -13,6 +13,6 @@ public class AuthorizeUseCase {
         return spotifyClient.authorize(code);
     }
     public boolean execute2() throws IOException {
-        this.spotifyClient.authenticate();
+        return spotifyClient.authenticate();
     }
 }
