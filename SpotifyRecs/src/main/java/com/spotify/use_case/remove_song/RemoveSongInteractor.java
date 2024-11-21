@@ -1,5 +1,6 @@
 package com.spotify.use_case.remove_song;
 
+/*
 import com.spotify.entity.RecommendationCriteria;
 import com.spotify.entity.RecommendationCriteriaFactory;
 import com.spotify.entity.Song;
@@ -29,9 +30,6 @@ public class RemoveSongInteractor implements RemoveSongInputBoundary{
         songs.removeIf(song -> song.getName().equalsIgnoreCase(remove));
         //Case where you don't want to save the playlist at all and you return to the home screen
         //Delete Songs use case
-
-
-
-
     }
 }
+*/
