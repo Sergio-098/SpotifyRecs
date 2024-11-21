@@ -13,7 +13,6 @@ import java.util.List;
 
 public class SavePlaylistInteractor implements SavePlaylistInputBoundary{
     private final SavePlaylistOutputBoundary userPresenter;
-    private final PlaylistFactory playlistFactory;
     private final SpotifyClient spotifyClient;
     private final User user;
     private final List<Song> songs;
@@ -24,7 +23,6 @@ public class SavePlaylistInteractor implements SavePlaylistInputBoundary{
                                   List<Song> songs) {
 
         this.userPresenter = signupOutputBoundary;
-        this.playlistFactory = playlistFactory;
         this.spotifyClient = spotifyClient;
         this.user = user;
         this.songs = songs;
@@ -46,7 +44,7 @@ public class SavePlaylistInteractor implements SavePlaylistInputBoundary{
     }
 
     @Override
-    public void switchToEndView() {
-        userPresenter.switchToEndView();
+    public void switchToLoggedInView() {
+        userPresenter.switchToLoggedInView();
     }
 }

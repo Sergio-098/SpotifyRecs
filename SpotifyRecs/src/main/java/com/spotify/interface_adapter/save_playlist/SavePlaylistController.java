@@ -27,9 +27,9 @@ public class SavePlaylistController {
     }
 
     /**
-     * Executes the "switch to LoginView" Use Case.
+     * Executes the "switch to LoggedInView" Use Case.
      */
-    public void switchToLoginView() {
-        savePlaylistInputBoundary.switchToEndView();
+    public void switchToLoggedInView() {
+        savePlaylistInputBoundary.switchToLoggedInView();
     }
 }

@@ -5,7 +5,7 @@ import java.io.IOException;
 public interface SavePlaylistInputBoundary {
 
     /**
-     * Executes the signup use case.
+     * Executes the save playlist use case.
      * @param savePlaylistInputData the input data
      */
     void execute(SavePlaylistInputData savePlaylistInputData) throws IOException;
@@ -13,5 +13,5 @@ public interface SavePlaylistInputBoundary {
     /**
      * Executes the switch to login view use case.
      */
-    void switchToEndView();
+    void switchToLoggedInView();
 }

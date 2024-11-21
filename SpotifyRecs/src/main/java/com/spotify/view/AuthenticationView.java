@@ -1,13 +1,16 @@
 package com.spotify.view;
 
 import com.spotify.api.SpotifyClient;
-import com.spotify.use_case.authorize.AuthorizeUseCase;
+import com.spotify.entity.User;
+import com.spotify.repositories.FileUserRepository;
+import com.spotify.use_case.authorize.AuthorizeInteractor;
 import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
 import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
+import org.apache.hc.core5.http.ParseException;
 
 import javax.swing.*;
 import java.awt.*;
@@ -17,12 +20,14 @@ public class AuthenticationView extends JPanel {
     private static final String clientId = "a54ea954b9fe41408a55d3a577126fa1";
     private static final String redirect = "http://localhost:8080/callback"; // Redirect URI
     private final String authUrl;
+    private FileUserRepository fuRepo;
     private SpotifyClient spotifyClient;
 
     public AuthenticationView() throws IOException {
         // Build the Spotify authorization URL
         this.spotifyClient = new SpotifyClient(clientId, redirect);
         this.authUrl = spotifyClient.getAuthorizationUrl();
+        this.fuRepo = new FileUserRepository();
 
         // Set layout
         this.setLayout(new BorderLayout());
@@ -48,7 +53,7 @@ public class AuthenticationView extends JPanel {
                     SwingUtilities.invokeLater(() -> {
                         try {
                             handleAuthorizationCode(code);
-                        } catch (IOException e) {
+                        } catch (IOException | ParseException e) {
                             throw new RuntimeException(e);
                         }
                     });
@@ -73,13 +78,15 @@ public class AuthenticationView extends JPanel {
         return null;
     }
 
-    private void handleAuthorizationCode(String code) throws IOException {
+    private void handleAuthorizationCode(String code) throws IOException, ParseException {
         // Handle the authorization code (e.g., transition to next view)
-        AuthorizeUseCase auth = new AuthorizeUseCase(spotifyClient);
+        AuthorizeInteractor auth = new AuthorizeInteractor(spotifyClient);
         auth.execute(code);
         // Transition to the next view, e.g., LoggedInView
+        User user = spotifyClient.getCurrentUser();
+        fuRepo.save(user);
         JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
-        parentFrame.setContentPane(new LoggedInView(spotifyClient));
+        parentFrame.setContentPane(new LoggedInView(spotifyClient, user));
 
         parentFrame.revalidate();
     }

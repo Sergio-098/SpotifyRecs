@@ -1,6 +1,7 @@
 package com.spotify.view;
 
 import com.spotify.api.SpotifyClient;
+import com.spotify.entity.User;
 
 import javax.swing.*;
 import java.awt.*;
@@ -8,7 +9,7 @@ import java.awt.*;
 public class LoggedInView extends JPanel {
     private SpotifyClient spotify;
 
-    public LoggedInView(SpotifyClient spotify) {
+    public LoggedInView(SpotifyClient spotify, User user) {
         this.spotify = spotify;
         this.setLayout(new BorderLayout());
         JLabel label = new JLabel("Logged in now", SwingConstants.CENTER);

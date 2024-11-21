@@ -7,7 +7,7 @@ public class SavePlaylistState {
     private String descriptionError;
     private Boolean isPublic = false;
 
-    public String getUsername() {
+    public String getName() {
         return name;
     }
 

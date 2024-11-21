@@ -3,13 +3,17 @@ package com.spotify.view;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.IOException;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+import com.spotify.api.SpotifyClient;
 import com.spotify.interface_adapter.save_playlist.SavePlaylistController;
 import com.spotify.interface_adapter.save_playlist.SavePlaylistState;
 import com.spotify.interface_adapter.save_playlist.SavePlaylistViewModel;
@@ -36,7 +40,7 @@ public class SaveView extends JPanel implements ActionListener, PropertyChangeLi
         final JLabel title = new JLabel(SavePlaylistViewModel.TITLE_LABEL);
         title.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        final LabelTextPanel usernameInfo = new LabelTextPanel(
+        final LabelTextPanel nameInfo = new LabelTextPanel(
                 new JLabel(SavePlaylistViewModel.NAME_LABEL), nameInputField);
         final LabelTextPanel descriptionInfo = new LabelTextPanel(
                 new JLabel(SavePlaylistViewModel.DESCRIPTION_LABEL), descriptionInputField);
@@ -51,8 +55,6 @@ public class SaveView extends JPanel implements ActionListener, PropertyChangeLi
         this.cancel = new JButton(SavePlaylistViewModel.CANCEL_BUTTON_LABEL);
         buttons.add(cancel);
 
-
-
         save.addActionListener(
                 // This creates an anonymous subclass of ActionListener and instantiates it.
                 new ActionListener() {
@@ -60,11 +62,15 @@ public class SaveView extends JPanel implements ActionListener, PropertyChangeLi
                         if (evt.getSource().equals(save)) {
                             final SavePlaylistState currentState = saveViewModel.getState();
 
-                            savePlaylistController.execute(
-                                    currentState.getName(),
-                                    currentState.getDescription(),
-                                    currentState.getPublic()
-                            );
+                            try {
+                                savePlaylistController.execute(
+                                        currentState.getName(),
+                                        currentState.getDescription(),
+                                        currentState.getIsPublic()
+                                );
+                            } catch (IOException e) {
+                                throw new RuntimeException(e);
+                            }
                         }
                     }
                 }
@@ -72,6 +78,81 @@ public class SaveView extends JPanel implements ActionListener, PropertyChangeLi
 
         cancel.addActionListener(this);
 
+        addNameListener();
+        addDescriptionListener();
+        addPublicListener();
+
+        this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+
+        this.add(title);
+        this.add(nameInfo);
+        this.add(descriptionInfo);
+        this.add(publicInfo);
+        this.add(buttons);
+
+    }
+
+    private void addNameListener() {
+        nameInputField.getDocument().addDocumentListener(new DocumentListener() {
+
+            private void documentListenerHelper() {
+                final SavePlaylistState currentState = saveViewModel.getState();
+                currentState.setName(nameInputField.getText());
+                saveViewModel.setState(currentState);
+            }
+
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                documentListenerHelper();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                documentListenerHelper();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                documentListenerHelper();
+            }
+        });
+    }
+
+    private void addDescriptionListener() {
+        descriptionInputField.getDocument().addDocumentListener(new DocumentListener() {
+
+            private void documentListenerHelper() {
+                final SavePlaylistState currentState = saveViewModel.getState();
+                currentState.setDescription(descriptionInputField.getText());
+                saveViewModel.setState(currentState);
+            }
+
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                documentListenerHelper();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                documentListenerHelper();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                documentListenerHelper();
+            }
+        });
+    }
+
+    private void addPublicListener() {
+        isPublicInputField.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                final SavePlaylistState currentState = saveViewModel.getState();
+                currentState.setIsPublic(isPublicInputField.isSelected());
+                saveViewModel.setState(currentState);
+            }
+        });
     }
 
 

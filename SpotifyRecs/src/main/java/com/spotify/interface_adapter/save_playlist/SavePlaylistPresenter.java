@@ -21,14 +21,14 @@ public class SavePlaylistPresenter implements SavePlaylistOutputBoundary {
 
     @Override
     public void prepareSuccessView(SavePlaylistOutputData response) {
-        // On success, switch to the next view.
-        final EndState endState = viewModel.getState();
-        endState.setName(response.getName());
-        this.viewModel.setState(endState);
-        viewModel.firePropertyChanged();
-
-        viewManagerModel.setState(viewModel.getViewName());
-        viewManagerModel.firePropertyChanged();
+//        // On success, switch to the next view.
+//        final EndState endState = viewModel.getState();
+//        endState.setName(response.getName());
+//        this.viewModel.setState(endState);
+//        viewModel.firePropertyChanged();
+//
+//        viewManagerModel.setState(viewModel.getViewName());
+//        viewManagerModel.firePropertyChanged();
     }
 
     @Override
@@ -39,7 +39,7 @@ public class SavePlaylistPresenter implements SavePlaylistOutputBoundary {
     }
 
     @Override
-    public void switchToEndView() {
+    public void switchToLoggedInView() {
         viewManagerModel.setState(viewModel.getViewName());
         viewManagerModel.firePropertyChanged();
     }

@@ -16,5 +16,5 @@ public interface SavePlaylistOutputBoundary {
     /**
      * Switches to the Login View.
      */
-    void switchToEndView();
+    void switchToLoggedInView();
 }
