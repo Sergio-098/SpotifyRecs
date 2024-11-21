@@ -6,6 +6,7 @@
     import com.spotify.repositories.FilePlaylistRepository;
     import com.spotify.use_case.generate.GenerateUseCase;
     import com.spotify.use_case.remove_song.RemoveSongUseCase;
+    import com.spotify.use_case.add_song.AddSongUseCase;
     import com.spotify.use_case.save_playlist.SavePlaylistUseCase;
     import org.apache.hc.core5.http.ParseException;
 
@@ -96,15 +97,18 @@
                             System.out.println("How many songs:");
                             String number = scanner.nextLine();
                             Integer num = Integer.valueOf(number);
-                            RecommendationCriteriaFactory rc = new RecommendationCriteriaFactory();
-                            RecommendationCriteria recCriteria = rc.createRecCrit(artists, genres, tracks);
-                            List<Song> newSongs = spotifyClient.getRecommendations(recCriteria, num);
+
+                            // Use the AddSongUseCase to add songs
+                            AddSongUseCase addSongUseCase = new AddSongUseCase(spotifyClient);
+                            List<Song> newSongs = addSongUseCase.execute(artists, genres, tracks, num);
                             songs.addAll(newSongs);
-                            //Delete Songs use case
                             break;
+
+
                         case "delete":
                             System.out.println("Which song would you like to delete?:");
                             String remove = scanner.nextLine();
+
                             RemoveSongUseCase removeSongUseCase = new RemoveSongUseCase();
                             removeSongUseCase.execute(songs, remove);
                             //Case where you don't want to save the playlist at all and you return to the home screen
