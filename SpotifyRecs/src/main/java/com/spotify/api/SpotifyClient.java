@@ -1,12 +1,6 @@
 package com.spotify.api;
 
-import com.spotify.entity.PlaylistFactory;
-import com.spotify.entity.SongFactory;
-import com.spotify.entity.UserFactory;
-import com.spotify.entity.Playlist;
-import com.spotify.entity.RecommendationCriteria;
-import com.spotify.entity.Song;
-import com.spotify.entity.User;
+import com.spotify.entity.*;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
@@ -22,8 +16,10 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Scanner;
 
 // Class to handle interactions with Spotify Web API
@@ -271,9 +267,23 @@ public class SpotifyClient implements SpotifyAPIClient {
         return playlistFactory.createPlaylist(playlist_id, playlist_name, playlist_description, isPublic, songs, user);
     }
 
-//    public List<String> getPlaylistnames() throws IOException, ParseException {
-//
-//    }
+    /**
+     * Get a list of all playlists owned by the user and their id's
+     * @param user_id
+     * @return List<SimplifiedPlaylist>
+     * @throws IOException
+     * @throws ParseException
+     */
+    public List<SimplifiedPlaylist> getUserPlaylists(String user_id) throws IOException, ParseException {
+        String userPlaylistsUrl = "https://api.spotify.com/v1/users/" + user_id + "/playlists/" ;
+        JSONObject jsonResponse = makeGetRequest(userPlaylistsUrl);
+        List<SimplifiedPlaylist> userPlaylists = new ArrayList<>();
+        for (int i = 0; i < jsonResponse.getJSONArray("items").length(); i++) {
+            JSONObject obj = jsonResponse.getJSONArray("items").getJSONObject(i);
+            userPlaylists.add(new SimplifiedPlaylist(obj.getString("id"), obj.getString("name")));
+        }
+        return userPlaylists;
+    }
 
     // Handle token expiration by refreshing the access token
     private void refreshAccessToken() throws IOException {
