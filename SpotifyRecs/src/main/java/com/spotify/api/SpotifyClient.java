@@ -1,12 +1,6 @@
 package com.spotify.api;
 
-import com.spotify.entity.PlaylistFactory;
-import com.spotify.entity.SongFactory;
-import com.spotify.entity.UserFactory;
-import com.spotify.entity.Playlist;
-import com.spotify.entity.RecommendationCriteria;
-import com.spotify.entity.Song;
-import com.spotify.entity.User;
+import com.spotify.entity.*;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
@@ -22,8 +16,10 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Scanner;
 
 // Class to handle interactions with Spotify Web API
@@ -234,6 +230,12 @@ public class SpotifyClient implements SpotifyAPIClient {
         return jsonResponse.getJSONObject("tracks").getJSONArray("items").getJSONObject(0).getString("id");
     }
 
+    /**
+     * Generates a list of available genres to choose from
+     * @return List<String>
+     * @throws IOException
+     * @throws ParseException
+     */
     public List<String> getGenres() throws IOException, ParseException {
         String baseGenre = "https://api.spotify.com/v1/recommendations/available-genre-seeds";
         JSONObject jsonResponse = makeGetRequest(baseGenre);
@@ -243,6 +245,44 @@ public class SpotifyClient implements SpotifyAPIClient {
             genresList.add(genresArray.getString(i));
         }
         return genresList;
+    }
+
+    /**
+     * Generates a playlist object from the user's spotify account in our system.
+     * @param playlist_id
+     * @return Playlist
+     * @throws IOException
+     * @throws ParseException
+     */
+    public Playlist getPlaylistById(String playlist_id) throws IOException, ParseException {
+        String playlistUrl = "https://api.spotify.com/v1/playlists/" + playlist_id;
+        JSONObject jsonResponse = makeGetRequest(playlistUrl);
+        String playlist_description = jsonResponse.getString("description");
+        String playlist_name = jsonResponse.getString("name");
+        boolean isPublic = jsonResponse.getBoolean("public");
+        SongFactory songFactory = new SongFactory();
+        List<Song> songs = songFactory.createSongs(jsonResponse.getJSONObject("tracks"));
+        User user = getCurrentUser();
+        PlaylistFactory playlistFactory = new PlaylistFactory();
+        return playlistFactory.createPlaylist(playlist_id, playlist_name, playlist_description, isPublic, songs, user);
+    }
+
+    /**
+     * Get a list of all playlists owned by the user and their id's
+     * @param user_id
+     * @return List<SimplifiedPlaylist>
+     * @throws IOException
+     * @throws ParseException
+     */
+    public List<SimplifiedPlaylist> getUserPlaylists(String user_id) throws IOException, ParseException {
+        String userPlaylistsUrl = "https://api.spotify.com/v1/users/" + user_id + "/playlists/" ;
+        JSONObject jsonResponse = makeGetRequest(userPlaylistsUrl);
+        List<SimplifiedPlaylist> userPlaylists = new ArrayList<>();
+        for (int i = 0; i < jsonResponse.getJSONArray("items").length(); i++) {
+            JSONObject obj = jsonResponse.getJSONArray("items").getJSONObject(i);
+            userPlaylists.add(new SimplifiedPlaylist(obj.getString("id"), obj.getString("name")));
+        }
+        return userPlaylists;
     }
 
     // Handle token expiration by refreshing the access token
