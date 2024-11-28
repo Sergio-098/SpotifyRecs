@@ -1,6 +1,9 @@
 package com.spotify.view;
 
 import com.spotify.api.SpotifyClient;
+import com.spotify.interface_adapter.authorize.AuthorizeController;
+import com.spotify.interface_adapter.authorize.AuthorizeViewModel;
+import com.spotify.interface_adapter.generate.LoggedInViewModel;
 import com.spotify.use_case.authorize.AuthorizeUseCase;
 import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
@@ -13,13 +16,23 @@ import javax.swing.*;
 import java.awt.*;
 import java.io.IOException;
 
-public class AuthenticationView extends JPanel {
+
+/**
+ * The View for when the user is logging into the program.
+ */
+public class AuthorizationView extends JPanel {
+    private final String viewName = "authorization";
+    private final AuthorizeViewModel authorizeViewModel;
+
     private static final String clientId = "a54ea954b9fe41408a55d3a577126fa1";
     private static final String redirect = "http://localhost:8080/callback"; // Redirect URI
     private final String authUrl;
-    private SpotifyClient spotifyClient;
+    private final SpotifyClient spotifyClient;
 
-    public AuthenticationView() throws IOException {
+    private AuthorizeController authorizeController;
+
+    public AuthorizationView(AuthorizeViewModel authorizeViewModel) throws IOException {
+        this.authorizeViewModel = authorizeViewModel;
         // Build the Spotify authorization URL
         this.spotifyClient = new SpotifyClient(clientId, redirect);
         this.authUrl = spotifyClient.getAuthorizationUrl();
@@ -79,8 +92,16 @@ public class AuthenticationView extends JPanel {
         auth.execute(code);
         // Transition to the next view, e.g., LoggedInView
         JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
-        parentFrame.setContentPane(new LoggedInView(spotifyClient));
+        parentFrame.setContentPane(new LoggedInView(new LoggedInViewModel()));
 
         parentFrame.revalidate();
+    }
+
+    public void setAuthorizeController(AuthorizeController controller) {
+        this.authorizeController = controller;
+    }
+
+    public String getViewName() {
+      return viewName;
     }
 }
