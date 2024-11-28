@@ -1,6 +1,5 @@
 package com.spotify.use_case.authorize;
 
-import com.spotify.data_access.FileUserDataAccessObject;
 
 public class AuthorizeInteractor implements AuthorizeInputBoundary {
     private final AuthorizeUserDataAccessInterface userDataAccessObject;

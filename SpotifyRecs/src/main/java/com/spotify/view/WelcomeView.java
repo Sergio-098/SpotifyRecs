@@ -1,17 +1,29 @@
 package com.spotify.view;
 
+import com.spotify.interface_adapter.authorize.WelcomeViewModel;
+import com.spotify.interface_adapter.authorize.AuthorizeViewModel;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.IOException;
 
-public class WelcomeView extends JPanel {
+public class WelcomeView extends JPanel implements PropertyChangeListener {
 
-    final private JLabel welcomeLabel;
-    final private JButton getAuthorizedButton;
+    private final String viewName = "welcome";
+    private final WelcomeViewModel welcomeViewModel;
 
-    public WelcomeView() {
+    private final JLabel welcomeLabel;
+    private final JButton getAuthorizedButton;
+
+
+    public WelcomeView(WelcomeViewModel welcomeViewModel ) {
+        this.welcomeViewModel = welcomeViewModel;
+        welcomeViewModel.addPropertyChangeListener(this);
+
         // Set the background color
         this.setBackground(new Color(30, 40, 45));
         this.setLayout(null); // Keep null layout for absolute positioning
@@ -29,6 +41,8 @@ public class WelcomeView extends JPanel {
         getAuthorizedButton.setFocusPainted(false);
         getAuthorizedButton.setBorderPainted(false);
         getAuthorizedButton.setOpaque(true);
+
+
         getAuthorizedButton.addActionListener(e -> {
             try {
                 openAuthenticationView();
@@ -73,8 +87,9 @@ public class WelcomeView extends JPanel {
 
     private void openAuthenticationView() throws IOException {
         // Switch to Authentication View
+        // should be implemented by authorize controller
         JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
-        parentFrame.setContentPane(new AuthenticationView());
+        parentFrame.setContentPane(new AuthorizationView(new AuthorizeViewModel()));
         parentFrame.revalidate();
     }
 
@@ -82,11 +97,20 @@ public class WelcomeView extends JPanel {
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             JFrame frame = new JFrame("SpotifyRecs");
-            WelcomeView welcomeView = new WelcomeView();
+            WelcomeView welcomeView = new WelcomeView(new WelcomeViewModel());
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             frame.setSize(1000, 800);
             frame.add(welcomeView);
             frame.setVisible(true);
         });
+    }
+
+    public String getViewName() {
+        return viewName;
+    }
+
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+
     }
 }
