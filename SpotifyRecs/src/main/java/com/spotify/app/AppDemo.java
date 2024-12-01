@@ -5,8 +5,10 @@ import com.spotify.entity.*;
 import com.spotify.api.SpotifyClient;
 import com.spotify.repositories.FilePlaylistRepository;
 import com.spotify.repositories.FileUserRepository;
+import com.spotify.use_case.add_song.AddSongInteractor;
 import com.spotify.use_case.authorize.AuthorizeUseCase;
-import com.spotify.use_case.generate.GenerateUseCase;
+import com.spotify.use_case.generate.GeneratePlaylistSongs;
+import com.spotify.use_case.remove_song.RemoveSongInteractor;
 import com.spotify.use_case.save_playlist.SavePlaylistUseCase;
 import org.apache.hc.core5.http.ParseException;
 
@@ -27,9 +29,11 @@ public class AppDemo {
         FilePlaylistRepository fplRepo = new FilePlaylistRepository();
         FileUserRepository fuRepo = new FileUserRepository();
 
-        GenerateUseCase gen = new GenerateUseCase(spotifyClient);
+        GeneratePlaylistSongs gen = new GeneratePlaylistSongs(spotifyClient);
         SavePlaylistUseCase save = new SavePlaylistUseCase(spotifyClient, fplRepo);
         AuthorizeUseCase auth = new AuthorizeUseCase(spotifyClient);
+        RemoveSongInteractor removeSongInteractor = new RemoveSongInteractor();
+        AddSongInteractor addSongInteractor = new AddSongInteractor(spotifyClient);
 
         if (auth.execute2()) {
 
@@ -100,17 +104,19 @@ public class AppDemo {
                         System.out.println("How many songs:");
                         String number = scanner.nextLine();
                         Integer num = Integer.valueOf(number);
-                        RecommendationCriteriaFactory rc = new RecommendationCriteriaFactory();
-                        RecommendationCriteria recCriteria = rc.createRecCrit(artists, genres, tracks);
-                        List<Song> newSongs = spotifyClient.getRecommendations(recCriteria, num);
+
+
+                        List<Song> newSongs = addSongInteractor.execute(artists, genres, tracks, num);
                         songs.addAll(newSongs);
-                        //Delete Songs use case
+
                         break;
-                    case "delete":
+
+
+                        case "delete":
                         System.out.println("Which song would you like to delete?:");
-                        String remove = scanner.nextLine();
-                        songs.removeIf(song -> song.getName().equalsIgnoreCase(remove));
-                        //Case where you don't want to save the playlist at all and you return to the home screen
+                        String songToRemove = scanner.nextLine();
+                        removeSongInteractor.execute(songs, songToRemove);
+
                         break;
 
                     case "no":
