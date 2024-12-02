@@ -1,5 +1,6 @@
 package com.spotify.app;
 
+import com.spotify.api.SpotifyClient;
 import com.spotify.data_access.FileUserDataAccessObject;
 import com.spotify.entity.UserFactory;
 import com.spotify.interface_adapter.ViewManagerModel;
@@ -10,18 +11,16 @@ import com.spotify.interface_adapter.authorize.AuthorizeViewModel;
 import com.spotify.interface_adapter.generate.GenerateController;
 import com.spotify.interface_adapter.generate.GeneratePresenter;
 import com.spotify.interface_adapter.generate.LoggedInViewModel;
-import com.spotify.interface_adapter.generate.RecommendationCriteriaViewModel;
 import com.spotify.interface_adapter.save_playlist.*;
 import com.spotify.use_case.authorize.AuthorizeInteractor;
 import com.spotify.use_case.authorize.AuthorizeOutputBoundary;
 import com.spotify.use_case.authorize.AuthorizeInputBoundary;
-import com.spotify.use_case.generate.GenerateInputBoundary;
-import com.spotify.use_case.generate.GenerateInteractor;
-import com.spotify.use_case.generate.GenerateOutputBoundary;
+import com.spotify.use_case.generate.*;
 import com.spotify.use_case.save_playlist.SavePlaylistInputBoundary;
 import com.spotify.use_case.save_playlist.SavePlaylistInteractor;
 import com.spotify.use_case.save_playlist.SavePlaylistOutputBoundary;
 import com.spotify.view.*;
+import org.apache.hc.core5.http.ParseException;
 
 import java.awt.CardLayout;
 import java.io.IOException;
@@ -39,7 +38,6 @@ import javax.swing.WindowConstants;
 public class AppBuilder {
     private final JPanel cardPanel = new JPanel();
     private final CardLayout cardLayout = new CardLayout();
-    private final UserFactory userFactory = new UserFactory();
     private final ViewManagerModel viewManagerModel = new ViewManagerModel();
     private final ViewManager viewManager = new ViewManager(cardPanel, cardLayout, viewManagerModel);
 
@@ -52,12 +50,13 @@ public class AppBuilder {
     private AuthorizationView authorizationView;
     private PlaylistViewModel playlistViewModel;
     private PlaylistView playlistView;
-    private RecommendationCriteriaViewModel recommendationCriteriaViewModel;
-    private RecommendationCriteriaView recommendationCriteriaView;
     private SavePlaylistView savePlaylistView;
     private SavePlaylistViewModel savePlaylistViewModel;
     private WelcomeViewModel welcomeViewModel;
     private WelcomeView welcomeView;
+    private GeneratePlaylistSongs genrePlaylistSongs;
+
+
 
     public AppBuilder() {
         cardPanel.setLayout(cardLayout);
@@ -68,9 +67,9 @@ public class AppBuilder {
      * Adds the Welcome View to the application.
      * @return this builder
      */
-    public AppBuilder addWelcomeView() {
+    public AppBuilder addWelcomeView(SpotifyClient spotifyClient) {
         welcomeViewModel = new WelcomeViewModel();
-        welcomeView = new WelcomeView(welcomeViewModel);
+        welcomeView = new WelcomeView(welcomeViewModel, spotifyClient);
         cardPanel.add(welcomeView, welcomeView.getViewName());
         return this;
     }
@@ -79,9 +78,9 @@ public class AppBuilder {
      * Adds the Authentication View to the application.
      * @return this builder
      */
-     public AppBuilder addAuthorizationView() throws IOException {
+     public AppBuilder addAuthorizationView(SpotifyClient spotifyClient) throws IOException {
          authorizeViewModel = new AuthorizeViewModel();
-         authorizationView = new AuthorizationView(authorizeViewModel);
+         authorizationView = new AuthorizationView(authorizeViewModel, spotifyClient);
          cardPanel.add(authorizationView, authorizationView.getViewName());
          return this;
      }
@@ -91,9 +90,9 @@ public class AppBuilder {
      * Adds the LoggedIn View to the application.
      * @return this builder
      */
-    public AppBuilder addLoggedInView() {
+    public AppBuilder addLoggedInView(SpotifyClient spotifyClient) throws IOException, ParseException {
         loggedInViewModel = new LoggedInViewModel();
-        loggedInView = new LoggedInView(loggedInViewModel);
+        loggedInView = new LoggedInView(loggedInViewModel, spotifyClient);
         cardPanel.add(loggedInView, loggedInView.getViewName());
         return this;
     }
@@ -132,45 +131,35 @@ public class AppBuilder {
     }
 
     /**
-     * Adds the RecommendationCriteria View to the application.
-     * @return this builder
-     */
-    public AppBuilder addRecommendationCriteriaView() {
-        recommendationCriteriaViewModel = new RecommendationCriteriaViewModel();
-        recommendationCriteriaView = new RecommendationCriteriaView(recommendationCriteriaViewModel);
-        cardPanel.add(recommendationCriteriaView, recommendationCriteriaView.getViewName());
-        return this;
-    }
-
-    /**
      * Adds the Authorize Use Case to the application.
      * @return this builder
      */
-    public AppBuilder addAuthorizeUseCase() {
+    public AppBuilder addAuthorizeUseCase(SpotifyClient spotifyClient) {
         final AuthorizeOutputBoundary authorizeOutputBoundary = new AuthorizePresenter(viewManagerModel, welcomeViewModel);
-        final AuthorizeInputBoundary authorizeInteractor = new AuthorizeInteractor(
-                userDataAccessObject, authorizeOutputBoundary);
+        final AuthorizeInputBoundary authorizeInteractor = new AuthorizeInteractor(spotifyClient,
+                authorizeOutputBoundary, userDataAccessObject);
 
         final AuthorizeController controller = new AuthorizeController(authorizeInteractor);
         authorizationView.setAuthorizeController(controller);
         return this;
     }
 
-    public AppBuilder addGenerateUseCase() {
+    public AppBuilder addGenerateUseCase(SpotifyClient spotifyClient) {
         final GenerateOutputBoundary generateOutputBoundary = new GeneratePresenter(viewManagerModel,
                 loggedInViewModel, playlistViewModel);
-        final GenerateInputBoundary generateInteractor = new GenerateInteractor(
-                userDataAccessObject, generateOutputBoundary);
+        final GenerateInputBoundary generateInteractor = new GenerateInteractor(userDataAccessObject,
+                generateOutputBoundary, spotifyClient);
 
         final GenerateController controller = new GenerateController(generateInteractor);
         loggedInView.setPlaylistController(controller);
         return this;
     }
 
-    public AppBuilder addSavePlaylistUseCase() {
+    public AppBuilder addSavePlaylistUseCase(SpotifyClient spotifyClient) {
         final SavePlaylistOutputBoundary savePlaylistOutputBoundary = new SavePlaylistPresenter(viewManagerModel,
-                playlistViewModel,loggedInViewModel);
-        final SavePlaylistInputBoundary savePlaylistInteractor = new SavePlaylistInteractor(userDataAccessObject, savePlaylistOutputBoundary);
+                savePlaylistViewModel,loggedInViewModel);
+        final SavePlaylistInputBoundary savePlaylistInteractor = new SavePlaylistInteractor(savePlaylistOutputBoundary,
+                spotifyClient, GenerateOutputData.getRecommendations(),userDataAccessObject);
         final SavePlaylistController controller = new SavePlaylistController(savePlaylistInteractor);
         playlistView.setController(controller);
         return this;

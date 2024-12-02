@@ -2,23 +2,28 @@ package com.spotify.app;
 
 import org.apache.hc.core5.http.ParseException;
 
+import com.spotify.api.SpotifyClient;
+
 import javax.swing.*;
 import java.io.IOException;
 
 public class App {
     public static void main(String[] args) throws IOException, ParseException {
+        String clientID = "a54ea954b9fe41408a55d3a577126fa1";
+        String redirect = "http://localhost:8080/callback";
+        SpotifyClient spotifyClient = new SpotifyClient(clientID, redirect);
+
         final AppBuilder appBuilder = new AppBuilder();
         final JFrame application = appBuilder
-                .addWelcomeView()
-                .addAuthorizationView()
-                .addLoggedInView()
+                .addWelcomeView(spotifyClient)
+                .addAuthorizationView(spotifyClient)
+                .addLoggedInView(spotifyClient)
                 .addPlaylistView()
                 .addSavePlaylistView()
                 .addAddSongView()
-                .addRecommendationCriteriaView()
-                .addAuthorizeUseCase()
-                .addGenerateUseCase()
-                .addSavePlaylistUseCase()
+                .addAuthorizeUseCase(spotifyClient)
+                .addGenerateUseCase(spotifyClient)
+                .addSavePlaylistUseCase(spotifyClient)
                 .build();
 
         application.pack();
@@ -26,16 +31,14 @@ public class App {
 
 
 //        System.out.println("Starting Spotify Playlist Generator...");
-//        String clientID = "a54ea954b9fe41408a55d3a577126fa1";
-//        String redirect = "http://localhost:8080/callback";
+
 //
 //        Scanner scanner = new Scanner(System.in);
 //        FileUserDataAccessObject fileUserDAO = new FileUserDataAccessObject();
 //
-//        SpotifyClient spotifyClient = new SpotifyClient(clientID, redirect);
-//
+
 //        GenerateUseCase gen = new GenerateUseCase(spotifyClient);
-//        SavePlaylistUseCase save = new SavePlaylistUseCase(spotifyClient, fileUserDAO);
+//        MockSavePlaylistInteractor save = new MockSavePlaylistInteractor(spotifyClient, fileUserDAO);
 //        AuthorizeUseCase auth = new AuthorizeUseCase(spotifyClient);
 //
 //        if (auth.execute2()) {
