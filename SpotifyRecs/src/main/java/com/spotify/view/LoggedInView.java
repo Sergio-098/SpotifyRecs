@@ -2,12 +2,10 @@ package com.spotify.view;
 
 import com.spotify.Constants;
 import com.spotify.api.SpotifyClient;
-import com.spotify.entity.User;
 import com.spotify.interface_adapter.generate.GenerateController;
 import com.spotify.interface_adapter.generate.LoggedInViewModel;
 import com.spotify.entity.Song;
-import com.spotify.entity.User;
-import com.spotify.use_case.generate.GeneratePlaylistSongs;
+import com.spotify.use_case.generate.GenerateOutputData;
 import org.apache.hc.core5.http.ParseException;
 
 import javax.swing.*;
@@ -18,14 +16,12 @@ import java.util.List;
 
 public class LoggedInView extends JPanel {
     private final LoggedInViewModel viewModel;
-    private SpotifyClient spotify;
-    private List<String> artistCriteria;  // List to store artists
-    private List<String> genreCriteria;   // List to store genres
-    private List<String> songCriteria;    // List to store songs
-    private List<String> playlistCriteria; // List to store playlists
-    private User user;
+    private final List<String> artistCriteria;  // List to store artists
+    private final List<String> genreCriteria;   // List to store genres
+    private final List<String> songCriteria;    // List to store songs
+    private final List<String> playlistCriteria; // List to store playlists
 
-    public LoggedInView(LoggedInViewModel viewModel, SpotifyClient spotify) throws IOException, ParseException {
+    public LoggedInView(LoggedInViewModel viewModel, SpotifyClient spotifyClient) throws IOException, ParseException {
         // Initialize the lists
 
         this.viewModel = viewModel;
@@ -58,37 +54,20 @@ public class LoggedInView extends JPanel {
 
         // Button for artists option
         JButton artistButton = new JButton("Option 1: Artists");
-        artistButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-        artistButton.setBackground(Color.DARK_GRAY);
-        artistButton.setForeground(Constants.Primary_Green);
-        artistButton.setFocusPainted(false);
-        artistButton.setFont(new Font("Arial", Font.PLAIN, 16));
-        artistButton.addActionListener(e -> showTextSelectionDialog("Artist Selection", artistCriteria, spotify));
-        optionsPanel.add(artistButton);
-        optionsPanel.add(Box.createVerticalStrut(10)); // Add spacing between buttons
+        artistButton.addActionListener(e -> showTextSelectionDialog("Artist Selection", artistCriteria, spotifyClient));
+        makeButtonUI(artistButton, optionsPanel);
+
 
         // Button for genres option
-        List<String> genres = spotify.getGenres();
+        List<String> genres = spotifyClient.getGenres();
         JButton genreButton = new JButton("Option 2: Genres");
-        genreButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-        genreButton.setBackground(Color.DARK_GRAY);
-        genreButton.setForeground(Constants.Primary_Green);
-        genreButton.setFocusPainted(false);
-        genreButton.setFont(new Font("Arial", Font.PLAIN, 16));
         genreButton.addActionListener(e -> showGenreSelectionDialog(genres, genreCriteria));
-        optionsPanel.add(genreButton);
-        optionsPanel.add(Box.createVerticalStrut(10));
+        makeButtonUI(genreButton, optionsPanel);
 
         //Button for Song Selection option
         JButton songButton = new JButton("Option 3: Songs");
-        songButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-        songButton.setBackground(Color.DARK_GRAY);
-        songButton.setForeground(Constants.Primary_Green);
-        songButton.setFocusPainted(false);
-        songButton.setFont(new Font("Arial", Font.PLAIN, 16));
-        songButton.addActionListener(e -> showTextSelectionDialog("Song Selection", songCriteria, spotify));
-        optionsPanel.add(songButton);
-        optionsPanel.add(Box.createVerticalStrut(10));
+        songButton.addActionListener(e -> showTextSelectionDialog("Song Selection", songCriteria, spotifyClient));
+        makeButtonUI(songButton, optionsPanel);
 
 
         this.add(optionsPanel, BorderLayout.CENTER);
@@ -99,19 +78,24 @@ public class LoggedInView extends JPanel {
         generateButton.setForeground(Constants.Primary_Green);
         generateButton.setFocusPainted(false);
         generateButton.setFont(new Font("Arial", Font.PLAIN, 20));
-        GeneratePlaylistSongs songReccomendation = new GeneratePlaylistSongs(spotify);
         generateButton.addActionListener(e -> {
-            try {
-                showRecommendationDialog(songReccomendation.execute(artistCriteria, genreCriteria, songCriteria));
-            } catch (IOException | ParseException ex) {
-                throw new RuntimeException(ex);
-            }
+            showRecommendationDialog(GenerateOutputData.getRecommendations());
         });
         this.add(generateButton, BorderLayout.SOUTH);
     }
 
+    private void makeButtonUI(JButton button, JPanel optionsPanel ) {
+        button.setAlignmentX(Component.CENTER_ALIGNMENT);
+        button.setBackground(Color.DARK_GRAY);
+        button.setForeground(Constants.Primary_Green);
+        button.setFocusPainted(false);
+        button.setFont(new Font("Arial", Font.PLAIN, 16));
+        optionsPanel.add(button);
+        optionsPanel.add(Box.createVerticalStrut(10)); // Add spacing between buttons
+    }
+
     // Method to show the selection dialog for artists
-    private void showTextSelectionDialog(String title, List<String> criteria, SpotifyClient spotify) {
+    private void showTextSelectionDialog(String title, List<String> criteria, SpotifyClient spotifyClient) {
         JFrame newFrame = new JFrame(title);
         newFrame.setSize(400, 600);
         newFrame.getContentPane().setBackground(Color.BLACK);
@@ -122,7 +106,7 @@ public class LoggedInView extends JPanel {
         mainPanel.setOpaque(false);
 
         JLabel label = new JLabel("Select Your Preferred Choice", SwingConstants.CENTER);
-        CreateLabel(mainPanel, label);
+        createLabel(mainPanel, label);
         DefaultListModel<String> listModel = new DefaultListModel<>();
         JList<String> list = new JList<>(listModel);
         list.setBackground(Color.DARK_GRAY);
@@ -155,14 +139,14 @@ public class LoggedInView extends JPanel {
                 listModel.addElement(itemName);
                 if (title.equals("Song Selection")) {
                     try {
-                        criteria.add(spotify.getSearchSong(itemName));
+                        criteria.add(spotifyClient.getSearchSong(itemName));
                     } catch (IOException | ParseException ex) {
                         throw new RuntimeException(ex);
                     }
                 }
                 else{
                     try {
-                        criteria.add(spotify.getSearchArtist(itemName));
+                        criteria.add(spotifyClient.getSearchArtist(itemName));
                     } catch (IOException | ParseException ex) {
                         throw new RuntimeException(ex);
                     }
@@ -178,7 +162,7 @@ public class LoggedInView extends JPanel {
         closeButton(closeButton, newFrame, mainPanel);
     }
 
-    private void CreateLabel(JPanel mainPanel, JLabel label) {
+    private void createLabel(JPanel mainPanel, JLabel label) {
         label.setFont(new Font("Arial", Font.BOLD, 20));
         label.setForeground(Color.WHITE);
         label.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -202,7 +186,7 @@ public class LoggedInView extends JPanel {
 
         // Label for the dialog
         JLabel label = new JLabel("Select Your Genres", SwingConstants.CENTER);
-        CreateLabel(mainPanel, label);
+        createLabel(mainPanel, label);
         JList<String> list = getStringJList(genres);
         JScrollPane scrollPane = new JScrollPane(list);
         scrollPane.setPreferredSize(new Dimension(300, 200));
@@ -329,33 +313,6 @@ public class LoggedInView extends JPanel {
             for (String artist : artistCriteria) {
                 System.out.println(artist); // Print each artist to the console
             }
-        }
-    }
-
-    // Getter for the artistCriteria list
-    public List<String> getArtistCriteria() {
-        return artistCriteria;
-    }
-
-    // Getter for the genreCriteria list
-    public List<String> getGenreCriteria() {
-        return genreCriteria;
-    }
-
-    // Getter for the songCriteria list
-    public List<String> getSongCriteria() {
-        return songCriteria;
-    }
-
-    // Getter for the playlistCriteria list
-    public List<String> getPlaylistCriteria() {
-        return playlistCriteria;
-        this.add(label, BorderLayout.CENTER);
-        spotify = new SpotifyClient("a54ea954b9fe41408a55d3a577126fa1", "http://localhost:8080/callback");
-        if(spotify.getAccessToken() != null) {
-            JLabel newLabel = new JLabel("Authorization Worked!!!!", SwingConstants.CENTER);
-            newLabel.setFont(new Font("Arial", Font.BOLD, 30));
-            this.add(newLabel, BorderLayout.SOUTH);
         }
     }
 
