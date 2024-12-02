@@ -3,9 +3,9 @@ package com.spotify.entity;
 import java.util.List;
 
 public class RecommendationCriteria {
-    private List<String> artistIds;
-    private List<String> genreIds;
-    private List<String> trackIds;
+    private final List<String> artistIds;
+    private final List<String> genreIds;
+    private final List<String> trackIds;
 
     // Constructor
     public RecommendationCriteria(List<String> artistIds, List<String> genreIds, List<String> trackIds) {
