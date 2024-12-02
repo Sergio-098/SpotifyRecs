@@ -46,7 +46,7 @@ public class LoggedInView extends JPanel {
         optionsPanel.setOpaque(false);
 
         JLabel optionsTitle = new JLabel("Please Select an Option", SwingConstants.CENTER);
-        optionsTitle.setFont(new Font("Arial", Font.BOLD, 20));
+        optionsTitle.setFont(Constants.ARIAL_BOLD);
         optionsTitle.setForeground(Color.WHITE);
         optionsTitle.setAlignmentX(Component.CENTER_ALIGNMENT);
         optionsPanel.add(optionsTitle);
@@ -75,9 +75,9 @@ public class LoggedInView extends JPanel {
         JButton generateButton = new JButton("Generate Playlist");
         generateButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         generateButton.setBackground(Color.DARK_GRAY);
-        generateButton.setForeground(Constants.Primary_Green);
+        generateButton.setForeground(Constants.PRIMARY_GREEN);
         generateButton.setFocusPainted(false);
-        generateButton.setFont(new Font("Arial", Font.PLAIN, 20));
+        generateButton.setFont(Constants.ARIAL_NORMAL);
         generateButton.addActionListener(e -> {
             showRecommendationDialog(GenerateOutputData.getRecommendations());
         });
@@ -87,9 +87,9 @@ public class LoggedInView extends JPanel {
     private void makeButtonUI(JButton button, JPanel optionsPanel ) {
         button.setAlignmentX(Component.CENTER_ALIGNMENT);
         button.setBackground(Color.DARK_GRAY);
-        button.setForeground(Constants.Primary_Green);
+        button.setForeground(Constants.PRIMARY_GREEN);
         button.setFocusPainted(false);
-        button.setFont(new Font("Arial", Font.PLAIN, 16));
+        button.setFont(Constants.ARIAL_NORMAL);
         optionsPanel.add(button);
         optionsPanel.add(Box.createVerticalStrut(10)); // Add spacing between buttons
     }
@@ -111,7 +111,7 @@ public class LoggedInView extends JPanel {
         JList<String> list = new JList<>(listModel);
         list.setBackground(Color.DARK_GRAY);
         list.setForeground(Color.WHITE);
-        list.setFont(new Font("Arial", Font.PLAIN, 16));
+        list.setFont(Constants.ARIAL_NORMAL);
         JScrollPane scrollPane = new JScrollPane(list);
         scrollPane.setPreferredSize(new Dimension(300, 200));
         mainPanel.add(scrollPane);
@@ -120,11 +120,11 @@ public class LoggedInView extends JPanel {
         JPanel inputPanel = new JPanel(new FlowLayout());
         inputPanel.setOpaque(false);
 
-        JTextField inputField = new JTextField(20);
-        inputField.setFont(new Font("Arial", Font.PLAIN, 16));
+        JTextField inputField = new JTextField(Constants.SONG_LIMIT);
+        inputField.setFont(Constants.ARIAL_NORMAL);
         inputField.setToolTipText("Enter " + "Selection".toLowerCase());
         JButton addButton = new JButton("Add");
-        addButton.setForeground(Constants.Primary_Green);
+        addButton.setForeground(Constants.PRIMARY_GREEN);
         addButton.setBackground(Color.DARK_GRAY);
         addButton.setFocusPainted(false);
 
@@ -163,7 +163,7 @@ public class LoggedInView extends JPanel {
     }
 
     private void createLabel(JPanel mainPanel, JLabel label) {
-        label.setFont(new Font("Arial", Font.BOLD, 20));
+        label.setFont(Constants.ARIAL_BOLD);
         label.setForeground(Color.WHITE);
         label.setAlignmentX(Component.CENTER_ALIGNMENT);
         mainPanel.add(label);
@@ -196,7 +196,7 @@ public class LoggedInView extends JPanel {
         // Button to confirm the selection
         JButton doneButton = new JButton("Done");
         doneButton.setBackground(Color.DARK_GRAY);
-        doneButton.setForeground(Constants.Primary_Green);
+        doneButton.setForeground(Constants.PRIMARY_GREEN);
         doneButton.setFocusPainted(false);
         doneButton.addActionListener(e -> {
             // Get the selected genres
@@ -227,14 +227,14 @@ public class LoggedInView extends JPanel {
         JList<String> list = new JList<>(listModel);
         list.setBackground(Color.DARK_GRAY);
         list.setForeground(Color.WHITE);
-        list.setFont(new Font("Arial", Font.PLAIN, 16));
+        list.setFont(Constants.ARIAL_NORMAL);
         list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);  // Allow multiple selections
         return list;
     }
 
     private static void closeButton(JButton closeButton, JFrame newFrame, JPanel mainPanel) {
         closeButton.setBackground(Color.DARK_GRAY);
-        closeButton.setForeground(Constants.Primary_Green);
+        closeButton.setForeground(Constants.PRIMARY_GREEN);
         closeButton.setFocusPainted(false);
         closeButton.addActionListener(e -> newFrame.dispose());  // Close the dialog without saving selections
         mainPanel.add(Box.createVerticalStrut(10));  // Spacer
@@ -261,7 +261,7 @@ public class LoggedInView extends JPanel {
 
         // Title label
         JLabel titleLabel = new JLabel("Your Recommendations", SwingConstants.CENTER);
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 20));
+        titleLabel.setFont(Constants.ARIAL_BOLD);
         titleLabel.setForeground(Color.WHITE);
         titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         mainPanel.add(titleLabel);
@@ -277,7 +277,7 @@ public class LoggedInView extends JPanel {
         JList<String> recommendationList = new JList<>(listModel);
         recommendationList.setBackground(Color.DARK_GRAY);
         recommendationList.setForeground(Color.WHITE);
-        recommendationList.setFont(new Font("Arial", Font.PLAIN, 16));
+        recommendationList.setFont(Constants.ARIAL_NORMAL);
         recommendationList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION); // Optional
         JScrollPane scrollPane = new JScrollPane(recommendationList);
         scrollPane.setPreferredSize(new Dimension(300, 400));
