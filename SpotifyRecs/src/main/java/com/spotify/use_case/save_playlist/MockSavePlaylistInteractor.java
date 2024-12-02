@@ -9,11 +9,11 @@ import com.spotify.entity.User;
 import java.io.IOException;
 import java.util.List;
 
-public class SavePlaylistUseCase {
+public class MockSavePlaylistInteractor {
     private final SpotifyClient spotifyClient;
     private final FileUserDataAccessObject fileUserDAO;
 
-    public SavePlaylistUseCase(SpotifyClient spotifyClient, FileUserDataAccessObject fileUserDAO) {
+    public MockSavePlaylistInteractor(SpotifyClient spotifyClient, FileUserDataAccessObject fileUserDAO) {
         this.spotifyClient = spotifyClient;
         this.fileUserDAO = fileUserDAO;
     }

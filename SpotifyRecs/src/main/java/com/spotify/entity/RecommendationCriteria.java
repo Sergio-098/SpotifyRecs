@@ -19,23 +19,14 @@ public class RecommendationCriteria {
         return artistIds;
     }
 
-    public void setArtistIds(List<String> artistIds) {
-        this.artistIds = artistIds;
-    }
-
     public List<String> getGenreIds() {
         return genreIds;
-    }
-
-    public void setGenreIds(List<String> genreIds) {
-        this.genreIds = genreIds;
     }
 
     public List<String> getTrackIds() {
         return trackIds;
     }
-
-    public void setTrackIds(List<String> trackIds) {
-        this.trackIds = trackIds;
-    }
 }
+
+
+
