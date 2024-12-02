@@ -17,6 +17,7 @@ import com.spotify.api.SpotifyClient;
 import com.spotify.interface_adapter.save_playlist.SavePlaylistController;
 import com.spotify.interface_adapter.save_playlist.SavePlaylistState;
 import com.spotify.interface_adapter.save_playlist.SavePlaylistViewModel;
+import org.apache.hc.core5.http.ParseException;
 
 /**
  * The View for the Save Use Case.
@@ -69,6 +70,8 @@ public class SaveView extends JPanel implements ActionListener, PropertyChangeLi
                                         currentState.getIsPublic()
                                 );
                             } catch (IOException e) {
+                                throw new RuntimeException(e);
+                            } catch (ParseException e) {
                                 throw new RuntimeException(e);
                             }
                         }
