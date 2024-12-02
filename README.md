@@ -60,12 +60,3 @@
   - In order to fork this repo, you simply have to navigate to the fork button and make your fork, as it is open to all programmers. Once you receive a reply from a member of our team, you may make a pull request. In our response you will receive a request ID. Please include this RequestID in your pull request comments, or we can not validate your request.
   - If your contribution has addressed any and all concerns our team has pointed out, one of us will then merge your request into the main branch.
 
-Users would like to sign in and link their Spotify account to the program so that the program can access their listening history and modify / save playlists to their Spotify account. [Sergio's story]
-
-Users would like to save the generated playlist to their collection. Users use the program to add the playlist to their collection which they can access on their Spotify account. [Sergio’s story]
-
-User has a playlist they already enjoy, and want another playlist of similar songs. User runs the program and program generates a new playlist with similar new songs. [Fawaz’s story]
-
-The user needs to input criteria into the recommendation algorithm. User sees genres and similar artists based on Constants provided in the code. User selects desired genres and similar artists to get more tailored recommendations. [Lola’s story]
-
-User is not satisfied with the generated playlist. User removes song/songs they don't like from the playlist and the algorithm continues to find more recommended songs to fill the playlist. [Justin’s story]
