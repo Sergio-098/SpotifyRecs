@@ -8,7 +8,6 @@ import com.spotify.entity.Song;
 import org.apache.hc.core5.http.ParseException;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 public class GenerateInteractor implements GenerateInputBoundary{
@@ -28,8 +27,8 @@ public class GenerateInteractor implements GenerateInputBoundary{
     public List<Song> execute(GenerateInputData generateInputData) throws IOException, ParseException {
             List<Song> recommendations = spotifyClient.getRecommendations(RecommendationCriteriaFactory.
                     createRecCrit(generateInputData.getArtistsIds(), generateInputData.getGenresIds(),
-                            generateInputData.getSongsIds()), Constants.SongLimit);
-        GenerateOutputData generateOutputData = new GenerateOutputData(recommendations);
+                            generateInputData.getSongsIds()), Constants.SONG_LIMIT);
+            GenerateOutputData.recommendations = recommendations;
             return recommendations;
     }
 
