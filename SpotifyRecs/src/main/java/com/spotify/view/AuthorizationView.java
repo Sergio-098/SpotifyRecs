@@ -38,7 +38,6 @@ public class AuthorizationView extends JPanel {
 
     public AuthorizationView(AuthorizeViewModel authorizeViewModel, SpotifyClient spotifyClient) throws IOException {
         this.authorizeViewModel = authorizeViewModel;
-
         // Build the Spotify authorization URL
         this.spotifyClient = spotifyClient;
         this.authUrl = spotifyClient.getAuthorizationUrl();
@@ -53,6 +52,7 @@ public class AuthorizationView extends JPanel {
 
         this.add(jfxPanel, BorderLayout.CENTER);
     }
+
 
     private void createWebView(JFXPanel jfxPanel) {
         // Create a WebView and load the Spotify authentication page
@@ -100,8 +100,7 @@ public class AuthorizationView extends JPanel {
         User user = spotifyClient.getCurrentUser();
         userDAO.save(user);
         JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
-        parentFrame.setContentPane(new LoggedInView(new LoggedInViewModel(), spotifyClient));
-
+        authorizeController.switchToLoggedInView();
         parentFrame.revalidate();
     }
 
@@ -110,6 +109,6 @@ public class AuthorizationView extends JPanel {
     }
 
     public String getViewName() {
-        return "authorization";
+        return "authorize";
     }
 }

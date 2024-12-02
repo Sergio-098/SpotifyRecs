@@ -4,10 +4,7 @@ import com.spotify.api.SpotifyClient;
 import com.spotify.data_access.FileUserDataAccessObject;
 import com.spotify.entity.UserFactory;
 import com.spotify.interface_adapter.ViewManagerModel;
-import com.spotify.interface_adapter.authorize.WelcomeViewModel;
-import com.spotify.interface_adapter.authorize.AuthorizeController;
-import com.spotify.interface_adapter.authorize.AuthorizePresenter;
-import com.spotify.interface_adapter.authorize.AuthorizeViewModel;
+import com.spotify.interface_adapter.authorize.*;
 import com.spotify.interface_adapter.generate.GenerateController;
 import com.spotify.interface_adapter.generate.GeneratePresenter;
 import com.spotify.interface_adapter.generate.LoggedInViewModel;
@@ -62,16 +59,7 @@ public class AppBuilder {
     }
 
 
-    /**
-     * Adds the Welcome View to the application.
-     * @return this builder
-     */
-    public AppBuilder addWelcomeView(SpotifyClient spotifyClient) {
-        welcomeViewModel = new WelcomeViewModel();
-        welcomeView = new WelcomeView(welcomeViewModel, spotifyClient);
-        cardPanel.add(welcomeView, welcomeView.getViewName());
-        return this;
-    }
+
 
     /**
      * Adds the Authentication View to the application.
@@ -84,6 +72,18 @@ public class AppBuilder {
          return this;
      }
 
+    /**
+     * Adds the Welcome View to the application.
+     * @return this builder
+     */
+    public AppBuilder addWelcomeView(SpotifyClient spotifyClient) {
+        welcomeViewModel = new WelcomeViewModel();
+        welcomeView = new WelcomeView(welcomeViewModel, spotifyClient);
+        cardPanel.add(welcomeView, welcomeView.getViewName());
+        final WelcomeController controller = new WelcomeController(new WelcomePresenter(authorizeViewModel, viewManagerModel));
+        welcomeView.setWelcomeController(controller);
+        return this;
+    }
 
     /**
      * Adds the LoggedIn View to the application.
@@ -134,7 +134,7 @@ public class AppBuilder {
      * @return this builder
      */
     public AppBuilder addAuthorizeUseCase(SpotifyClient spotifyClient) {
-        final AuthorizeOutputBoundary authorizeOutputBoundary = new AuthorizePresenter(viewManagerModel, welcomeViewModel);
+        final AuthorizeOutputBoundary authorizeOutputBoundary = new AuthorizePresenter(viewManagerModel, loggedInViewModel);
         final AuthorizeInputBoundary authorizeInteractor = new AuthorizeInteractor(spotifyClient,
                 authorizeOutputBoundary, userDataAccessObject);
 

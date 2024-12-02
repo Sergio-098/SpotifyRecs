@@ -15,8 +15,8 @@ public class App {
 
         final AppBuilder appBuilder = new AppBuilder();
         final JFrame application = appBuilder
-                .addWelcomeView(spotifyClient)
                 .addAuthorizationView(spotifyClient)
+                .addWelcomeView(spotifyClient)
                 .addLoggedInView(spotifyClient)
                 .addPlaylistView()
                 .addSavePlaylistView()

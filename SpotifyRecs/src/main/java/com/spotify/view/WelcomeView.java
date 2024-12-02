@@ -1,6 +1,8 @@
 package com.spotify.view;
 
 import com.spotify.api.SpotifyClient;
+import com.spotify.interface_adapter.authorize.AuthorizeController;
+import com.spotify.interface_adapter.authorize.WelcomeController;
 import com.spotify.interface_adapter.authorize.WelcomeViewModel;
 import com.spotify.interface_adapter.authorize.AuthorizeViewModel;
 
@@ -19,6 +21,8 @@ public class WelcomeView extends JPanel implements PropertyChangeListener {
     private final SpotifyClient spotifyClient;
     private final JLabel welcomeLabel;
     private final JButton getAuthorizedButton;
+
+    private WelcomeController welcomeController;
 
 
     public WelcomeView(WelcomeViewModel welcomeViewModel, SpotifyClient spotifyClient) {
@@ -91,21 +95,25 @@ public class WelcomeView extends JPanel implements PropertyChangeListener {
         // Switch to Authentication View
         // should be implemented by authorize controller
         JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
-        parentFrame.setContentPane(new AuthorizationView(new AuthorizeViewModel(), spotifyClient));
+        welcomeController.switchToAuthorizeView();
         parentFrame.revalidate();
     }
 
-    // Main method for testing
-    public static void main(String[] args) {
-        SpotifyClient spotifyClient = new SpotifyClient( "a54ea954b9fe41408a55d3a577126fa1", "http://localhost:8080/callback");
-        SwingUtilities.invokeLater(() -> {
-            JFrame frame = new JFrame("SpotifyRecs");
-            WelcomeView welcomeView = new WelcomeView(new WelcomeViewModel(), spotifyClient);
-            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            frame.setSize(1000, 800);
-            frame.add(welcomeView);
-            frame.setVisible(true);
-        });
+//    // Main method for testing
+//    public static void main(String[] args) {
+//        SpotifyClient spotifyClient = new SpotifyClient( "a54ea954b9fe41408a55d3a577126fa1", "http://localhost:8080/callback");
+//        SwingUtilities.invokeLater(() -> {
+//            JFrame frame = new JFrame("SpotifyRecs");
+//            WelcomeView welcomeView = new WelcomeView(new WelcomeViewModel(), spotifyClient);
+//            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+//            frame.setSize(1000, 800);
+//            frame.add(welcomeView);
+//            frame.setVisible(true);
+//        });
+//    }
+
+    public void setWelcomeController(WelcomeController controller) {
+        this.welcomeController = controller;
     }
 
     public String getViewName() {

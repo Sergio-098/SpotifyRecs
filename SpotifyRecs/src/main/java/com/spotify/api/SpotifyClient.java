@@ -210,6 +210,50 @@ public class SpotifyClient implements SpotifyAPIClient {
         return jsonResponse.getJSONObject("artists").getJSONArray("items").getJSONObject(0).getString("id");
     }
 
+    public List<String> getArtistQuery(String artistQuery) throws IOException, ParseException {
+        String baseArtist = "https://api.spotify.com/v1/search";
+        String[] a = artistQuery.split("\\s+");
+        String aa = "";
+        for (int i = 0; i < a.length; i++) {
+            aa = aa.concat(a[i]);
+            if (1 < a.length - i) {
+                aa = aa.concat("+");
+            }
+        }
+        String endpoint = baseArtist +
+                "?q=artist%3A" + aa + "&type=artist&market=CA&limit=5";
+        JSONObject jsonResponse = makeGetRequest(endpoint);
+        JSONArray items =  jsonResponse.getJSONObject("artists").getJSONArray("items");
+        return parse(items);
+    }
+
+    public List<String> getSongQuery(String songQuery) throws IOException, ParseException {
+        String baseSong = "https://api.spotify.com/v1/search";
+        String[] a = songQuery.split("\\s+");
+        String aa = "";
+        for (int i = 0; i < a.length; i++) {
+            aa = aa.concat(a[i]);
+            if (1 < a.length - i) {
+                aa = aa.concat("+");
+            }
+        }
+        String endpoint = baseSong +
+                "?q=track%3a" + aa + "&type=track&market=CA&limit=5";
+        JSONObject jsonResponse = makeGetRequest(endpoint);
+        JSONArray items =  jsonResponse.getJSONObject("tracks").getJSONArray("items");
+        return parse(items);
+    }
+
+    private List<String> parse(JSONArray items) {
+        List<String> list = new ArrayList<>();
+
+        for (int i = 0; i < items.length(); i++) {
+            JSONObject track = items.getJSONObject(i);
+            list.add(track.getString("name"));
+        }
+        return list;
+    }
+
     public String getSearchSong(String song) throws IOException, ParseException {
         String baseSong = "https://api.spotify.com/v1/search";
         String[] a = song.split("\\s+");
