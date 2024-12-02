@@ -1,5 +1,6 @@
 package com.spotify.api;
 
+import com.spotify.Constants;
 import com.spotify.entity.*;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
@@ -16,10 +17,8 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Scanner;
 
 // Class to handle interactions with Spotify Web API
@@ -178,7 +177,7 @@ public class SpotifyClient implements SpotifyAPIClient {
 
         // Send the request
         JSONObject jsonResponse = makeGetRequest(recUrl);
-        System.out.println(jsonResponse.toString());
+        System.out.println(jsonResponse);
         // Parse the JSON response and create a list of Song objects
         return SongFactory.createSongs(jsonResponse);
     }
@@ -241,7 +240,7 @@ public class SpotifyClient implements SpotifyAPIClient {
 //        for (int i = 0; i < genresArray.length(); i++) {
 //            genresList.add(genresArray.getString(i));
 //        }
-        return List.of();
+        return Constants.genres;
     }
 
 
