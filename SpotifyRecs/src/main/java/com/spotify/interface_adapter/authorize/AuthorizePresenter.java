@@ -33,6 +33,16 @@ public class AuthorizePresenter implements AuthorizeOutputBoundary {
     }
 
     @Override
+    public void switchToLoggedInView() {
+
+    }
+
+    @Override
+    public void switchToLoginView() {
+
+    }
+
+    @Override
     public void switchToWelcomeView() {
         viewManagerModel.setState(welcomeViewModel.getViewName());
         viewManagerModel.firePropertyChanged();

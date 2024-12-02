@@ -13,5 +13,9 @@ public interface AuthorizeOutputBoundary {
     /**
      * Switches to the Welcome View.
      */
+    void switchToLoggedInView();
+
+    void switchToLoginView();
+
     void switchToWelcomeView();
 }
