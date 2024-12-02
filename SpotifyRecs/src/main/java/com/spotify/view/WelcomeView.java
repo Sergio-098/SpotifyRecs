@@ -1,5 +1,6 @@
 package com.spotify.view;
 
+import com.spotify.api.SpotifyClient;
 import com.spotify.interface_adapter.authorize.WelcomeViewModel;
 import com.spotify.interface_adapter.authorize.AuthorizeViewModel;
 
@@ -15,13 +16,14 @@ public class WelcomeView extends JPanel implements PropertyChangeListener {
 
     private final String viewName = "welcome";
     private final WelcomeViewModel welcomeViewModel;
-
+    private final SpotifyClient spotifyClient;
     private final JLabel welcomeLabel;
     private final JButton getAuthorizedButton;
 
 
-    public WelcomeView(WelcomeViewModel welcomeViewModel ) {
+    public WelcomeView(WelcomeViewModel welcomeViewModel, SpotifyClient spotifyClient) {
         this.welcomeViewModel = welcomeViewModel;
+        this.spotifyClient = spotifyClient;
         welcomeViewModel.addPropertyChangeListener(this);
 
         // Set the background color
@@ -45,7 +47,7 @@ public class WelcomeView extends JPanel implements PropertyChangeListener {
 
         getAuthorizedButton.addActionListener(e -> {
             try {
-                openAuthenticationView();
+                openAuthorizationView();
             } catch (IOException ex) {
                 throw new RuntimeException(ex);
             }
@@ -85,19 +87,20 @@ public class WelcomeView extends JPanel implements PropertyChangeListener {
         getAuthorizedButton.setFont(new Font("Arial", Font.BOLD, panelHeight / 25)); // Adjust font size dynamically
     }
 
-    private void openAuthenticationView() throws IOException {
+    private void openAuthorizationView() throws IOException {
         // Switch to Authentication View
         // should be implemented by authorize controller
         JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
-        parentFrame.setContentPane(new AuthorizationView(new AuthorizeViewModel()));
+        parentFrame.setContentPane(new AuthorizationView(new AuthorizeViewModel(), spotifyClient));
         parentFrame.revalidate();
     }
 
     // Main method for testing
     public static void main(String[] args) {
+        SpotifyClient spotifyClient = new SpotifyClient( "a54ea954b9fe41408a55d3a577126fa1", "http://localhost:8080/callback");
         SwingUtilities.invokeLater(() -> {
             JFrame frame = new JFrame("SpotifyRecs");
-            WelcomeView welcomeView = new WelcomeView(new WelcomeViewModel());
+            WelcomeView welcomeView = new WelcomeView(new WelcomeViewModel(), spotifyClient);
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             frame.setSize(1000, 800);
             frame.add(welcomeView);
