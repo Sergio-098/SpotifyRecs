@@ -5,9 +5,12 @@ import java.io.IOException;
 
 public interface AuthorizeInputBoundary {
 
+
     /**
      * Executes the save playlist use case.
-     * @param code the access code given
+     * @param authorizeInputData the input for authorize use case
      */
-    boolean execute(String code) throws IOException;
+    boolean execute(AuthorizeInputData authorizeInputData) throws IOException;
+
+    void switchToLoginView();
 }

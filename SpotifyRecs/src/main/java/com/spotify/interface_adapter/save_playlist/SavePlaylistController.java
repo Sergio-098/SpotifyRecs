@@ -1,7 +1,10 @@
 package com.spotify.interface_adapter.save_playlist;
 
 import com.spotify.use_case.save_playlist.SavePlaylistInputBoundary;
+
+import com.spotify.use_case.save_playlist.SavePlaylistInputBoundary;
 import com.spotify.use_case.save_playlist.SavePlaylistInputData;
+import org.apache.hc.core5.http.ParseException;
 
 import java.io.IOException;
 
@@ -19,7 +22,7 @@ public class SavePlaylistController {
      * @param description the description
      * @param isPublic the public status of the playlist
      */
-    public void execute(String name, String description, boolean isPublic) throws IOException {
+    public void execute(String name, String description, boolean isPublic) throws IOException, ParseException {
         final SavePlaylistInputData signupInputData = new SavePlaylistInputData(
                 name, description, isPublic);
 

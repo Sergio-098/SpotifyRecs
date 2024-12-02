@@ -14,6 +14,7 @@ import com.spotify.entity.User;
 import com.spotify.entity.UserFactory;
 import com.spotify.entity.PlaylistFactory;
 import com.spotify.entity.SongFactory;
+import com.spotify.use_case.authorize.AuthorizeUserDataAccessInterface;
 
 //This is going to interact with the CSV files (basically Excel spreadsheets) and
 //save all the information we need to them so that they don't get lost. It will
@@ -22,7 +23,7 @@ import com.spotify.entity.SongFactory;
 //It does this by taking all the data in the CSVs and creating the objects again.
 //Never edit the CSVs manually.
 
-public class FileUserDataAccessObject {
+public class FileUserDataAccessObject implements AuthorizeUserDataAccessInterface {
 
     private static final String USER_HEADER = "username,password,userId";
     private static final String PLAYLIST_HEADER = "userId,playlistId,name,description,isPublic";
@@ -47,15 +48,14 @@ public class FileUserDataAccessObject {
     //information from previous sessions. It is used heavily in the app builder class
     //under the app package. It is the same as lab 5.
 
-    public FileUserDataAccessObject(String userCsvPath, String playlistCsvPath, String songCsvPath,
-                                    UserFactory userFactory, PlaylistFactory playlistFactory, SongFactory songFactory) throws IOException {
-        this.userCsvFile = new File(userCsvPath);
-        this.playlistCsvFile = new File(playlistCsvPath);
-        this.songCsvFile = new File(songCsvPath);
+    public FileUserDataAccessObject() {
+        this.userCsvFile = new File("userCsvPath");
+        this.playlistCsvFile = new File("playlistCsvPath");
+        this.songCsvFile = new File("songCsvPath");
 
-        this.userFactory = userFactory;
-        this.playlistFactory = playlistFactory;
-        this.songFactory = songFactory;
+        this.userFactory = new UserFactory();
+        this.playlistFactory = new PlaylistFactory();
+        this.songFactory = new SongFactory();
 
         // Initialize headers
         userHeaders.put("username", 0);
@@ -72,7 +72,11 @@ public class FileUserDataAccessObject {
         songHeaders.put("name", 2);
         songHeaders.put("artists", 3);
 
-        load();
+        try {
+            load();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private void load() throws IOException {

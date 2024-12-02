@@ -1,8 +1,5 @@
 package com.spotify.use_case.remove_song;
-import com.spotify.entity.RecommendationCriteriaFactory;
-import com.spotify.entity.RecommendationCriteria;
 import com.spotify.entity.Song;
-import com.spotify.api.SpotifyClient;
 
 import java.util.List;
 

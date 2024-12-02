@@ -1,17 +1,31 @@
 package com.spotify.view;
 
+import com.spotify.api.SpotifyClient;
+import com.spotify.interface_adapter.authorize.WelcomeViewModel;
+import com.spotify.interface_adapter.authorize.AuthorizeViewModel;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.IOException;
 
-public class WelcomeView extends JPanel {
+public class WelcomeView extends JPanel implements PropertyChangeListener {
 
-    final private JLabel welcomeLabel;
-    final private JButton getAuthorizedButton;
+    private final String viewName = "welcome";
+    private final WelcomeViewModel welcomeViewModel;
+    private final SpotifyClient spotifyClient;
+    private final JLabel welcomeLabel;
+    private final JButton getAuthorizedButton;
 
-    public WelcomeView() {
+
+    public WelcomeView(WelcomeViewModel welcomeViewModel, SpotifyClient spotifyClient) {
+        this.welcomeViewModel = welcomeViewModel;
+        this.spotifyClient = spotifyClient;
+        welcomeViewModel.addPropertyChangeListener(this);
+
         // Set the background color
         this.setBackground(new Color(30, 40, 45));
         this.setLayout(null); // Keep null layout for absolute positioning
@@ -29,9 +43,11 @@ public class WelcomeView extends JPanel {
         getAuthorizedButton.setFocusPainted(false);
         getAuthorizedButton.setBorderPainted(false);
         getAuthorizedButton.setOpaque(true);
+
+
         getAuthorizedButton.addActionListener(e -> {
             try {
-                openAuthenticationView();
+                openAuthorizationView();
             } catch (IOException ex) {
                 throw new RuntimeException(ex);
             }
@@ -71,22 +87,33 @@ public class WelcomeView extends JPanel {
         getAuthorizedButton.setFont(new Font("Arial", Font.BOLD, panelHeight / 25)); // Adjust font size dynamically
     }
 
-    private void openAuthenticationView() throws IOException {
+    private void openAuthorizationView() throws IOException {
         // Switch to Authentication View
+        // should be implemented by authorize controller
         JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
-        parentFrame.setContentPane(new AuthenticationView());
+        parentFrame.setContentPane(new AuthorizationView(new AuthorizeViewModel(), spotifyClient));
         parentFrame.revalidate();
     }
 
     // Main method for testing
     public static void main(String[] args) {
+        SpotifyClient spotifyClient = new SpotifyClient( "a54ea954b9fe41408a55d3a577126fa1", "http://localhost:8080/callback");
         SwingUtilities.invokeLater(() -> {
             JFrame frame = new JFrame("SpotifyRecs");
-            WelcomeView welcomeView = new WelcomeView();
+            WelcomeView welcomeView = new WelcomeView(new WelcomeViewModel(), spotifyClient);
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             frame.setSize(1000, 800);
             frame.add(welcomeView);
             frame.setVisible(true);
         });
+    }
+
+    public String getViewName() {
+        return viewName;
+    }
+
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+
     }
 }

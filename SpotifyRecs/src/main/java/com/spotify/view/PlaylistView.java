@@ -6,6 +6,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.List;
 
+
 public class PlaylistView extends JPanel {
     public PlaylistView(List<Song> playlist) {
         this.setLayout(new BorderLayout());
@@ -26,33 +27,38 @@ public class PlaylistView extends JPanel {
         for (Song song : playlist) {
             // Add each song's name to the list model (You can modify to show more details)
             listModel.addElement(song.getName() + " - " + song.getArtists());
+
+            // Create a JList to display the songs
+            JList<String> songList = new JList<>(listModel);
+            songList.setBackground(Color.DARK_GRAY);
+            songList.setForeground(Color.WHITE);
+            songList.setFont(new Font("Arial", Font.PLAIN, 16));
+            songList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+            JScrollPane scrollPane = new JScrollPane(songList);
+            scrollPane.setPreferredSize(new Dimension(300, 400));
+            songPanel.add(scrollPane);
+
+            // Add the song panel to the main panel
+            this.add(songPanel, BorderLayout.CENTER);
+
+
+            JButton closeButton = new JButton("Close Playlist");
+            closeButton.setBackground(Color.DARK_GRAY);
+            closeButton.setForeground(Color.GREEN);
+            closeButton.setFocusPainted(false);
+            closeButton.setFont(new Font("Arial", Font.PLAIN, 16));
+            closeButton.addActionListener(e -> {
+
+                JFrame frame = (JFrame) SwingUtilities.getWindowAncestor(this);
+                frame.dispose();
+            });
+
+            this.add(closeButton, BorderLayout.SOUTH);
+
         }
+    }
 
-        // Create a JList to display the songs
-        JList<String> songList = new JList<>(listModel);
-        songList.setBackground(Color.DARK_GRAY);
-        songList.setForeground(Color.WHITE);
-        songList.setFont(new Font("Arial", Font.PLAIN, 16));
-        songList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        JScrollPane scrollPane = new JScrollPane(songList);
-        scrollPane.setPreferredSize(new Dimension(300, 400));
-        songPanel.add(scrollPane);
-
-        // Add the song panel to the main panel
-        this.add(songPanel, BorderLayout.CENTER);
-
-
-        JButton closeButton = new JButton("Close Playlist");
-        closeButton.setBackground(Color.DARK_GRAY);
-        closeButton.setForeground(Color.GREEN);
-        closeButton.setFocusPainted(false);
-        closeButton.setFont(new Font("Arial", Font.PLAIN, 16));
-        closeButton.addActionListener(e -> {
-
-            JFrame frame = (JFrame) SwingUtilities.getWindowAncestor(this);
-            frame.dispose();
-        });
-
-        this.add(closeButton, BorderLayout.SOUTH);
+    public String getViewName() {
+        return "playlist";
     }
 }

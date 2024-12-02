@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 public class UserFactory {
-    public User createUser(JSONObject json) {
+    public static User createUser(JSONObject json) {
         UserInfoParser userParse = new UserInfoParser();
         Map<String, String> userInfo = userParse.parse(json);
         List<Playlist> playlists = new ArrayList<>();

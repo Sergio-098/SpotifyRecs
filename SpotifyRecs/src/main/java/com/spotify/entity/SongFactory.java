@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SongFactory {
-    public List<Song> createSongs(JSONObject json) {
+    public static List<Song> createSongs(JSONObject json) {
         List<Song> songs = new ArrayList<>();
 
         SongNameParser songNameParser = new SongNameParser();

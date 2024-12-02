@@ -19,8 +19,7 @@ public class AddSongInteractor {
     }
 
     public List<Song> execute(List<String> artists, List<String> genres, List<String> tracks, int num) throws IOException, ParseException {
-        RecommendationCriteriaFactory rcFactory = new RecommendationCriteriaFactory();
-        RecommendationCriteria recCriteria = rcFactory.createRecCrit(artists, genres, tracks);
+        RecommendationCriteria recCriteria = RecommendationCriteriaFactory.createRecCrit(artists, genres, tracks);
         return spotifyClient.getRecommendations(recCriteria, num);
     }
 }

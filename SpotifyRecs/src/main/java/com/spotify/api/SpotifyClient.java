@@ -1,5 +1,6 @@
 package com.spotify.api;
 
+import com.spotify.Constants;
 import com.spotify.entity.*;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
@@ -16,10 +17,8 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Scanner;
 
 // Class to handle interactions with Spotify Web API
@@ -125,9 +124,8 @@ public class SpotifyClient implements SpotifyAPIClient {
         String id = jsonResponse.getString("id");
 
         List<Song> songs = new ArrayList<>();
-        PlaylistFactory pf = new PlaylistFactory();
         // Return a new Playlist object with the obtained ID
-        return pf.createPlaylist(id, name, description, isPublic, songs, user);
+        return PlaylistFactory.createPlaylist(id, name, description, isPublic, songs, user);
     }
 
     //Method to add the generated songs (or any song for that matter as long
@@ -179,10 +177,9 @@ public class SpotifyClient implements SpotifyAPIClient {
 
         // Send the request
         JSONObject jsonResponse = makeGetRequest(recUrl);
-        System.out.println(jsonResponse.toString());
+        System.out.println(jsonResponse);
         // Parse the JSON response and create a list of Song objects
-        SongFactory songFactory = new SongFactory();
-        return songFactory.createSongs(jsonResponse);
+        return SongFactory.createSongs(jsonResponse);
     }
 
     //Get the info of the current user and return it as a user object
@@ -194,8 +191,7 @@ public class SpotifyClient implements SpotifyAPIClient {
         JSONObject jsonResponse = makeGetRequest(userUrl);
 
         // Parse the JSON response and create a User object
-        UserFactory uf = new UserFactory();
-        return uf.createUser(jsonResponse);
+        return UserFactory.createUser(jsonResponse);
     }
 
     public String getSearchArtist(String artist) throws IOException, ParseException {
@@ -214,9 +210,9 @@ public class SpotifyClient implements SpotifyAPIClient {
         return jsonResponse.getJSONObject("artists").getJSONArray("items").getJSONObject(0).getString("id");
     }
 
-    public String getSearchSong(String artist) throws IOException, ParseException {
+    public String getSearchSong(String song) throws IOException, ParseException {
         String baseSong = "https://api.spotify.com/v1/search";
-        String[] a = artist.split("\\s+");
+        String[] a = song.split("\\s+");
         String aa = "";
         for (int i = 0; i < a.length; i++) {
             aa = aa.concat(a[i]);
@@ -237,15 +233,16 @@ public class SpotifyClient implements SpotifyAPIClient {
      * @throws ParseException
      */
     public List<String> getGenres() throws IOException, ParseException {
-        String baseGenre = "https://api.spotify.com/v1/recommendations/available-genre-seeds";
-        JSONObject jsonResponse = makeGetRequest(baseGenre);
-        JSONArray genresArray = jsonResponse.getJSONArray("genres");
-        List<String> genresList = new ArrayList<>();
-        for (int i = 0; i < genresArray.length(); i++) {
-            genresList.add(genresArray.getString(i));
-        }
-        return genresList;
+//        String baseGenre = "https://api.spotify.com/v1/recommendations/available-genre-seeds";
+//        JSONObject jsonResponse = makeGetRequest(baseGenre);
+//        JSONArray genresArray = jsonResponse.getJSONArray("genres");
+//        List<String> genresList = new ArrayList<>();
+//        for (int i = 0; i < genresArray.length(); i++) {
+//            genresList.add(genresArray.getString(i));
+//        }
+        return Constants.genres;
     }
+
 
     /**
      * Generates a playlist object from the user's spotify account in our system.
@@ -260,11 +257,8 @@ public class SpotifyClient implements SpotifyAPIClient {
         String playlist_description = jsonResponse.getString("description");
         String playlist_name = jsonResponse.getString("name");
         boolean isPublic = jsonResponse.getBoolean("public");
-        SongFactory songFactory = new SongFactory();
-        List<Song> songs = songFactory.createSongs(jsonResponse.getJSONObject("tracks"));
-        User user = getCurrentUser();
-        PlaylistFactory playlistFactory = new PlaylistFactory();
-        return playlistFactory.createPlaylist(playlist_id, playlist_name, playlist_description, isPublic, songs, user);
+        List<Song> songs = SongFactory.createSongs(jsonResponse.getJSONObject("tracks"));
+        return PlaylistFactory.createPlaylist(playlist_id, playlist_name, playlist_description, isPublic, songs, getCurrentUser());
     }
 
     /**
