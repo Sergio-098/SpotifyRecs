@@ -28,7 +28,7 @@ public class AuthorizeController {
      * Executes the "switch to LoggedInView" Use Case.
      */
     public void switchToLoggedInView() {
-        authorizeInteractor.switchToLoginView();
+        authorizeInteractor.switchToLoggedInView();
     }
 
 }

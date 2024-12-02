@@ -1,6 +1,8 @@
 package com.spotify.interface_adapter.authorize;
 
 import com.spotify.interface_adapter.ViewManagerModel;
+import com.spotify.interface_adapter.generate.LoggedInState;
+import com.spotify.interface_adapter.generate.LoggedInViewModel;
 import com.spotify.use_case.authorize.AuthorizeOutputBoundary;
 import com.spotify.use_case.authorize.AuthorizeOutputData;
 
@@ -10,44 +12,31 @@ import com.spotify.use_case.authorize.AuthorizeOutputData;
 */
 public class AuthorizePresenter implements AuthorizeOutputBoundary {
 
-    private final WelcomeViewModel welcomeViewModel;
+    private final LoggedInViewModel loggedInViewModel;
     private final ViewManagerModel viewManagerModel;
 
 
-    public AuthorizePresenter(ViewManagerModel viewManagerModel, WelcomeViewModel welcomeViewModel) {
+    public AuthorizePresenter(ViewManagerModel viewManagerModel, LoggedInViewModel loggedInViewModel) {
         this.viewManagerModel = viewManagerModel;
-        this.welcomeViewModel = welcomeViewModel;
+        this.loggedInViewModel = loggedInViewModel;
     }
 
     @Override
     public void prepareSuccessView(AuthorizeOutputData outputData) {
         // On success, switch to the welcome view.
-        final WelcomeState welcomeState = welcomeViewModel.getState();
-        // show welcome <username> on switching to welcome view
-        welcomeState.setUsername(outputData.getUsername());
-        this.welcomeViewModel.setState(welcomeState);
-        welcomeViewModel.firePropertyChanged();
+        final LoggedInState loginState = loggedInViewModel.getState();
+        this.loggedInViewModel.setState(loginState);
+        loggedInViewModel.firePropertyChanged();
 
-        viewManagerModel.setState(welcomeViewModel.getViewName());
+        viewManagerModel.setState(loggedInViewModel.getViewName());
         viewManagerModel.firePropertyChanged();
     }
+
 
     @Override
     public void switchToLoggedInView() {
-
-    }
-
-    @Override
-    public void switchToLoginView() {
-
-    }
-
-    @Override
-    public void switchToWelcomeView() {
-        viewManagerModel.setState(welcomeViewModel.getViewName());
+        viewManagerModel.setState(loggedInViewModel.getViewName());
         viewManagerModel.firePropertyChanged();
     }
-
-
 
 }

@@ -12,5 +12,6 @@ public interface AuthorizeInputBoundary {
      */
     boolean execute(AuthorizeInputData authorizeInputData) throws IOException;
 
-    void switchToLoginView();
+
+    void switchToLoggedInView();
 }

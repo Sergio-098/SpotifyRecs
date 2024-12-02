@@ -27,9 +27,8 @@ public class AuthorizeInteractor implements AuthorizeInputBoundary {
     }
 
     @Override
-    public void switchToLoginView() {
-        authorizePresenter.switchToLoginView();
+    public void switchToLoggedInView() {
+        authorizePresenter.switchToLoggedInView();
     }
-
 
 }
