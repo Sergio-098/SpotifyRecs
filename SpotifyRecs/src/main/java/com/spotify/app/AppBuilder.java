@@ -54,7 +54,6 @@ public class AppBuilder {
     private SavePlaylistViewModel savePlaylistViewModel;
     private WelcomeViewModel welcomeViewModel;
     private WelcomeView welcomeView;
-    private GeneratePlaylistSongs genrePlaylistSongs;
 
 
 
