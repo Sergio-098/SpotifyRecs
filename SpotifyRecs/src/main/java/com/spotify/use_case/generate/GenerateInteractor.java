@@ -1,6 +1,6 @@
 package com.spotify.use_case.generate;
 
-import com.spotify.Constants;
+import com.spotify.util.Constants;
 import com.spotify.api.SpotifyClient;
 import com.spotify.data_access.FileUserDataAccessObject;
 import com.spotify.entity.RecommendationCriteriaFactory;

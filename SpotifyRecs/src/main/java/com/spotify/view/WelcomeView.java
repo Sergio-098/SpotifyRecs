@@ -1,10 +1,9 @@
 package com.spotify.view;
 
 import com.spotify.api.SpotifyClient;
-import com.spotify.interface_adapter.authorize.AuthorizeController;
 import com.spotify.interface_adapter.authorize.WelcomeController;
 import com.spotify.interface_adapter.authorize.WelcomeViewModel;
-import com.spotify.interface_adapter.authorize.AuthorizeViewModel;
+import com.spotify.util.Constants;
 
 import javax.swing.*;
 import java.awt.*;
@@ -31,19 +30,19 @@ public class WelcomeView extends JPanel implements PropertyChangeListener {
         welcomeViewModel.addPropertyChangeListener(this);
 
         // Set the background color
-        this.setBackground(new Color(30, 40, 45));
+        this.setBackground(Constants.BACKGROUND_COLOUR);
         this.setLayout(null); // Keep null layout for absolute positioning
 
         // Create and style the welcome label
         welcomeLabel = new JLabel("Welcome to SpotifyRecs", SwingConstants.CENTER);
-        welcomeLabel.setFont(new Font("Arial", Font.BOLD, 80));
-        welcomeLabel.setForeground(new Color(0, 150, 0));
+        welcomeLabel.setFont(Constants.ARIAL_BOLD_80);
+        welcomeLabel.setForeground(Constants.PRIMARY_GREEN);
         this.add(welcomeLabel);
 
         // Create and style the button
         getAuthorizedButton = new JButton("Get Authorized");
-        getAuthorizedButton.setFont(new Font("Arial", Font.BOLD, 25));
-        getAuthorizedButton.setBackground(new Color(0, 150, 0));
+        getAuthorizedButton.setFont(Constants.ARIAL_BOLD_25);
+        getAuthorizedButton.setBackground(Constants.PRIMARY_GREEN);
         getAuthorizedButton.setFocusPainted(false);
         getAuthorizedButton.setBorderPainted(false);
         getAuthorizedButton.setOpaque(true);

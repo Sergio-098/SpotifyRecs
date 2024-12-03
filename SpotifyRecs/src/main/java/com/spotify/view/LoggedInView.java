@@ -1,6 +1,6 @@
 package com.spotify.view;
 
-import com.spotify.Constants;
+import com.spotify.util.Constants;
 import com.spotify.api.SpotifyClient;
 import com.spotify.interface_adapter.generate.GenerateController;
 import com.spotify.interface_adapter.generate.LoggedInViewModel;
@@ -36,7 +36,7 @@ public class LoggedInView extends JPanel {
 
         // Title label
         JLabel label = new JLabel("Welcome to Spotify Recs", SwingConstants.CENTER);
-        label.setFont(new Font("Arial", Font.BOLD, 30));
+        label.setFont(Constants.ARIAL_BOLD_30);
         label.setForeground(Color.WHITE);
         this.add(label, BorderLayout.NORTH);
 
@@ -46,7 +46,7 @@ public class LoggedInView extends JPanel {
         optionsPanel.setOpaque(false);
 
         JLabel optionsTitle = new JLabel("Please Select an Option", SwingConstants.CENTER);
-        optionsTitle.setFont(Constants.ARIAL_BOLD);
+        optionsTitle.setFont(Constants.ARIAL_BOLD_20);
         optionsTitle.setForeground(Color.WHITE);
         optionsTitle.setAlignmentX(Component.CENTER_ALIGNMENT);
         optionsPanel.add(optionsTitle);
@@ -163,7 +163,7 @@ public class LoggedInView extends JPanel {
     }
 
     private void createLabel(JPanel mainPanel, JLabel label) {
-        label.setFont(Constants.ARIAL_BOLD);
+        label.setFont(Constants.ARIAL_BOLD_20);
         label.setForeground(Color.WHITE);
         label.setAlignmentX(Component.CENTER_ALIGNMENT);
         mainPanel.add(label);
@@ -261,7 +261,7 @@ public class LoggedInView extends JPanel {
 
         // Title label
         JLabel titleLabel = new JLabel("Your Recommendations", SwingConstants.CENTER);
-        titleLabel.setFont(Constants.ARIAL_BOLD);
+        titleLabel.setFont(Constants.ARIAL_BOLD_20);
         titleLabel.setForeground(Color.WHITE);
         titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         mainPanel.add(titleLabel);

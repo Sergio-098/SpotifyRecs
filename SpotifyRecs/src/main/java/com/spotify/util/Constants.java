@@ -1,4 +1,4 @@
-package com.spotify;
+package com.spotify.util;
 
 import java.awt.*;
 import java.util.List;
@@ -6,7 +6,10 @@ import java.util.List;
 public class Constants {
     public static final Color PRIMARY_GREEN = new Color(0, 150, 0);
     public static final Color BACKGROUND_COLOUR = new Color(30, 40, 45);
-    public static final Font ARIAL_BOLD = new Font("Arial", Font.BOLD, 20);
+    public static final Font ARIAL_BOLD_20 = new Font("Arial", Font.BOLD, 20);
+    public static final Font ARIAL_BOLD_25 = new Font("Arial", Font.BOLD, 25);
+    public static final Font ARIAL_BOLD_30 = new Font("Arial", Font.BOLD, 30);
+    public static final Font ARIAL_BOLD_80 = new Font("Arial", Font.BOLD, 80);
     public static final Font ARIAL_NORMAL = new Font("Arial", Font.PLAIN, 16);
     public static final int SONG_LIMIT = 20;
     public static final List<String> genres = List.of("acoustic",
